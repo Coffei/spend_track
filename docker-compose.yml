@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: spend_track_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: spend_track_dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql
+    # Use host networking so Postgres listens on the host's network namespace
+    network_mode: host
+
+volumes:
+  pgdata:
+
+
