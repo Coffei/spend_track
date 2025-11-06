@@ -19,7 +19,6 @@ defmodule SpendTrackWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
-    get "/login", SessionController, :new
 
     get "/auth/:provider", AuthController, :request
     get "/auth/:provider/callback", AuthController, :callback
