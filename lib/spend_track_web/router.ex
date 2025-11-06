@@ -8,6 +8,7 @@ defmodule SpendTrackWeb.Router do
     plug :put_root_layout, html: {SpendTrackWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug SpendTrackWeb.Plugs.FetchCurrentUser
   end
 
   pipeline :api do
@@ -18,6 +19,11 @@ defmodule SpendTrackWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+    get "/login", SessionController, :new
+
+    get "/auth/:provider", AuthController, :request
+    get "/auth/:provider/callback", AuthController, :callback
+    delete "/logout", AuthController, :delete
   end
 
   # Other scopes may use custom stacks.

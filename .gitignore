@@ -35,3 +35,5 @@ spend_track-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# Ignore Makefile that is includes secret ENV for dev.
+Makefile
