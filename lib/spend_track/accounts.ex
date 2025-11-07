@@ -16,6 +16,12 @@ defmodule SpendTrack.Accounts do
   @spec get_account!(integer()) :: Account.t()
   def get_account!(id), do: Repo.get!(Account, id)
 
+  @spec get_account!(integer(), integer()) :: Account.t()
+  def get_account!(id, user_id) do
+    from(a in Account, where: a.id == ^id and a.user_id == ^user_id)
+    |> Repo.one!()
+  end
+
   @spec create_account(map()) :: {:ok, Account.t()} | {:error, Ecto.Changeset.t()}
   def create_account(attrs \\ %{}) do
     %Account{}

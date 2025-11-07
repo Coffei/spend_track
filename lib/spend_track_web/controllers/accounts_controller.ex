@@ -37,8 +37,8 @@ defmodule SpendTrackWeb.AccountsController do
     end
   end
 
-  def edit(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
+  def edit(%{assigns: %{current_user: current_user}} = conn, %{"id" => id}) do
+    account = Accounts.get_account!(id, current_user.id)
 
     render(conn, :edit,
       account: account,
@@ -46,8 +46,11 @@ defmodule SpendTrackWeb.AccountsController do
     )
   end
 
-  def update(conn, %{"id" => id, "account" => account_params}) do
-    account = Accounts.get_account!(id)
+  def update(%{assigns: %{current_user: current_user}} = conn, %{
+        "id" => id,
+        "account" => account_params
+      }) do
+    account = Accounts.get_account!(id, current_user.id)
 
     attrs = Map.take(account_params, ["color", "name"])
 
@@ -67,8 +70,8 @@ defmodule SpendTrackWeb.AccountsController do
     end
   end
 
-  def delete(conn, %{"id" => id}) do
-    account = Accounts.get_account!(id)
+  def delete(%{assigns: %{current_user: current_user}} = conn, %{"id" => id}) do
+    account = Accounts.get_account!(id, current_user.id)
 
     case Accounts.delete_account(account) do
       {:ok, _} ->
