@@ -20,6 +20,8 @@ defmodule SpendTrack.Model.User do
     field :provider, :string
     field :uid, :string
 
+    has_many :accounts, SpendTrack.Model.Account
+
     timestamps()
   end
 

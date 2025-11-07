@@ -6,6 +6,7 @@ defmodule SpendTrack.Model.Account do
           id: integer() | nil,
           name: String.t() | nil,
           color: String.t() | nil,
+          user_id: integer() | nil,
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }
@@ -13,6 +14,7 @@ defmodule SpendTrack.Model.Account do
   schema "accounts" do
     field :name, :string
     field :color, :string
+    belongs_to :user, SpendTrack.Model.User
     has_many :payments, SpendTrack.Model.Payment
 
     timestamps()
@@ -22,7 +24,7 @@ defmodule SpendTrack.Model.Account do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(account, attrs) do
     account
-    |> cast(attrs, [:name, :color])
-    |> validate_required([:name, :color])
+    |> cast(attrs, [:name, :color, :user_id])
+    |> validate_required([:name, :color, :user_id])
   end
 end

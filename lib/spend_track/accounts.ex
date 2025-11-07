@@ -7,9 +7,10 @@ defmodule SpendTrack.Accounts do
   alias SpendTrack.Repo
   alias SpendTrack.Model.Account
 
-  @spec list_accounts() :: [Account.t()]
-  def list_accounts do
-    Repo.all(Account)
+  @spec list_accounts(integer()) :: [Account.t()]
+  def list_accounts(user_id) do
+    from(a in Account, where: a.user_id == ^user_id)
+    |> Repo.all()
   end
 
   @spec get_account!(integer()) :: Account.t()
