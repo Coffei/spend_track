@@ -37,6 +37,7 @@ defmodule SpendTrackWeb.Router do
     post "/accounts", AccountsController, :create
     get "/accounts/:id/edit", AccountsController, :edit
     patch "/accounts/:id", AccountsController, :update
+    delete "/accounts/:id", AccountsController, :delete
   end
 
   # Other scopes may use custom stacks.

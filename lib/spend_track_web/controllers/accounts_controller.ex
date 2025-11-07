@@ -66,4 +66,20 @@ defmodule SpendTrackWeb.AccountsController do
         )
     end
   end
+
+  def delete(conn, %{"id" => id}) do
+    account = Accounts.get_account!(id)
+
+    case Accounts.delete_account(account) do
+      {:ok, _} ->
+        conn
+        |> put_flash(:info, "Account deleted successfully.")
+        |> redirect(to: ~p"/accounts")
+
+      {:error, _} ->
+        conn
+        |> put_flash(:error, "Could not delete account.")
+        |> redirect(to: ~p"/accounts")
+    end
+  end
 end
