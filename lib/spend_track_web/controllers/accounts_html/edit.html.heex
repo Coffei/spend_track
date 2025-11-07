@@ -1,0 +1,21 @@
+<div class="max-w-2xl mx-auto py-6">
+  <h1 class="text-2xl font-semibold mb-4">Edit account</h1>
+
+  <.account_form
+    id="edit-account-form"
+    form={@form}
+    action={~p"/accounts/#{@account}"}
+    method="patch"
+    submit_label="Save changes"
+  >
+    <:cancel>
+      <.link
+        navigate={~p"/accounts"}
+        class="ml-2 text-sm font-medium text-zinc-600 hover:text-zinc-900"
+      >
+        Cancel
+      </.link>
+    </:cancel>
+  </.account_form>
+</div>
+

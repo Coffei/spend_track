@@ -36,4 +36,34 @@ defmodule SpendTrackWeb.AccountsController do
         )
     end
   end
+
+  def edit(conn, %{"id" => id}) do
+    account = Accounts.get_account!(id)
+
+    render(conn, :edit,
+      account: account,
+      form: Phoenix.Component.to_form(Accounts.change_account(account), as: :account)
+    )
+  end
+
+  def update(conn, %{"id" => id, "account" => account_params}) do
+    account = Accounts.get_account!(id)
+
+    attrs = Map.take(account_params, ["color", "name"])
+
+    case Accounts.update_account(account, attrs) do
+      {:ok, _account} ->
+        conn
+        |> put_flash(:info, "Account updated successfully.")
+        |> redirect(to: ~p"/accounts")
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        conn
+        |> put_flash(:error, "Could not update account.")
+        |> render(:edit,
+          account: account,
+          form: Phoenix.Component.to_form(changeset, as: :account)
+        )
+    end
+  end
 end
