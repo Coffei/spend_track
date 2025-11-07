@@ -1,5 +1,15 @@
 <div class="max-w-2xl mx-auto py-6">
-  <h1 class="text-2xl font-semibold mb-4">Accounts</h1>
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-semibold">Accounts</h1>
+
+    <.button
+      id="create-new-button"
+      class={!is_nil(@form.source.action) && "hidden"}
+      phx-click={open_form_js()}
+    >
+      Add new account
+    </.button>
+  </div>
 
   <div class="mb-4">
     <.account_form
@@ -18,14 +28,6 @@
         </.link>
       </:cancel>
     </.account_form>
-
-    <.button
-      id="create-new-button"
-      class={!is_nil(@form.source.action) && "hidden"}
-      phx-click={open_form_js()}
-    >
-      Add new account
-    </.button>
   </div>
   <%= if Enum.empty?(@accounts) do %>
     <p class="text-gray-600">No accounts yet.</p>

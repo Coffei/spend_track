@@ -8,6 +8,7 @@
         v{Application.spec(:spend_track, :vsn)}
       </p>
       <.link :if={@current_user} href={~p"/accounts"} class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80">Accounts</.link>
+      <.link :if={@current_user} href={~p"/payments"} class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80">Payments</.link>
     </div>
     <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
       <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">

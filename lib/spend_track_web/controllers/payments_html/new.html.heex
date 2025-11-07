@@ -1,0 +1,12 @@
+<div class="max-w-2xl mx-auto py-6">
+  <h1 class="text-2xl font-semibold mb-4">New Payment</h1>
+
+  <.payment_form
+    id="new-payment-form"
+    form={@form}
+    accounts={@accounts}
+    action={~p"/payments"}
+    method="post"
+  />
+</div>
+

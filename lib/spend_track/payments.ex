@@ -36,6 +36,14 @@ defmodule SpendTrack.Payments do
   end
 
   @doc """
+  Returns a changeset for a payment.
+  """
+  @spec change_payment(Payment.t(), map()) :: Ecto.Changeset.t()
+  def change_payment(%Payment{} = payment, attrs \\ %{}) do
+    Payment.changeset(payment, attrs)
+  end
+
+  @doc """
   Locate payments by conditions provided as a keyword list.
 
   Supported keys:
@@ -44,7 +52,11 @@ defmodule SpendTrack.Payments do
   """
   @spec list_payments_by(Keyword.t()) :: [Payment.t()]
   def list_payments_by(conditions \\ []) when is_list(conditions) do
-    base = from(p in Payment)
+    base =
+      from(p in Payment,
+        join: a in assoc(p, :account),
+        preload: [account: a]
+      )
 
     dynamic =
       Enum.reduce(conditions, true, fn
@@ -58,11 +70,14 @@ defmodule SpendTrack.Payments do
         {:time_lte, v}, dyn -> dynamic([p], ^dyn and p.time <= ^v)
         {:amount_gte, v}, dyn -> dynamic([p], ^dyn and p.amount >= ^v)
         {:amount_lte, v}, dyn -> dynamic([p], ^dyn and p.amount <= ^v)
+        {:user_id, v}, dyn -> dynamic([_p, a], ^dyn and a.user_id == ^v)
         {_unknown, _}, dyn -> dyn
       end)
 
     base
     |> where(^dynamic)
+    |> order_by(desc: :time)
+    |> limit(100)
     |> Repo.all()
   end
 end
