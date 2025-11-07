@@ -11,6 +11,10 @@ defmodule SpendTrackWeb.Router do
     plug SpendTrackWeb.Plugs.FetchCurrentUser
   end
 
+  pipeline :authenticated do
+    plug SpendTrackWeb.Plugs.RequireUser
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -23,6 +27,14 @@ defmodule SpendTrackWeb.Router do
     get "/auth/:provider", AuthController, :request
     get "/auth/:provider/callback", AuthController, :callback
     delete "/logout", AuthController, :delete
+  end
+
+  scope "/", SpendTrackWeb do
+    pipe_through :browser
+    pipe_through :authenticated
+
+    get "/accounts", AccountsController, :index
+    post "/accounts", AccountsController, :create
   end
 
   # Other scopes may use custom stacks.

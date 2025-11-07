@@ -18,14 +18,14 @@ defmodule SpendTrackWeb.AuthController do
       {:error, _reason} ->
         conn
         |> put_flash(:error, "Failed to sign in")
-        |> redirect(to: ~p"/login")
+        |> redirect(to: ~p"/")
     end
   end
 
   def callback(conn, _params) do
     conn
     |> put_flash(:error, "Auth failed")
-    |> redirect(to: ~p"/login")
+    |> redirect(to: ~p"/")
   end
 
   def delete(conn, _params) do

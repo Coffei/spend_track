@@ -1,0 +1,43 @@
+<div class="max-w-2xl mx-auto py-6">
+  <h1 class="text-2xl font-semibold mb-4">Accounts</h1>
+
+  <div class="mb-4">
+    <.simple_form
+      :let={f}
+      id="new"
+      for={@form}
+      as={:account}
+      action={~p"/accounts"}
+      method="post"
+      class={ is_nil(@form.source.action) && "hidden"}
+    >
+      <.input field={f[:color]} type="color" label="Color" class="!size-8" />
+      <.input field={f[:name]} label="Name" type="text" />
+      <:actions>
+        <.button type="submit">Create</.button>
+        <.button type="button" phx-click={hide_form_js()} class="!bg-white hover:!bg-zinc-200 !text-black">Cancel</.button>
+      </:actions>
+    </.simple_form>
+
+    <.button
+      id="create-new-button"
+      class={!is_nil(@form.source.action) && "hidden"}
+      phx-click={open_form_js()}
+    >
+      Add new account
+    </.button>
+  </div>
+  <%= if Enum.empty?(@accounts) do %>
+    <p class="text-gray-600">No accounts yet.</p>
+  <% else %>
+    <ul class="divide-y divide-gray-200">
+      <%= for account <- @accounts do %>
+        <li class="flex items-center gap-3 py-3">
+          <span class="inline-block w-4 h-4 rounded" style={"background-color: #{account.color}"}>
+          </span>
+          <span>{account.name}</span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>
