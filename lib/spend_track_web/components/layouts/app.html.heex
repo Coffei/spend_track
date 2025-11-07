@@ -7,8 +7,20 @@
       <p class="bg-brand/10 text-brand rounded-full px-2 font-medium leading-6">
         v{Application.spec(:spend_track, :vsn)}
       </p>
-      <.link :if={@current_user} href={~p"/accounts"} class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80">Accounts</.link>
-      <.link :if={@current_user} href={~p"/payments"} class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80">Payments</.link>
+      <.link
+        :if={@current_user}
+        href={~p"/accounts"}
+        class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80"
+      >
+        Accounts
+      </.link>
+      <.link
+        :if={@current_user}
+        href={~p"/payments"}
+        class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80"
+      >
+        Payments
+      </.link>
     </div>
     <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
       <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
@@ -24,14 +36,19 @@
       <span :if={@current_user} class="rounded-lg bg-zinc-100 px-2 py-1">
         {@current_user.name}
       </span>
-      <.link :if={@current_user} href="/logout" method="delete" class="rounded-lg px-2 py-1 hover:bg-zinc-200/80">
+      <.link
+        :if={@current_user}
+        href="/logout"
+        method="delete"
+        class="rounded-lg px-2 py-1 hover:bg-zinc-200/80"
+      >
         Log out
       </.link>
     </div>
   </div>
 </header>
 <main class="px-4 py-8 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
+  <div class="mx-auto max-w-4xl">
     <.flash_group flash={@flash} />
     {@inner_content}
   </div>

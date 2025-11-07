@@ -1,6 +1,8 @@
 defmodule SpendTrackWeb.AccountsHTML do
   use SpendTrackWeb, :html
 
+  import SpendTrackWeb.PaymentsHTML
+
   embed_templates "accounts_html/*"
 
   attr :form, :any, required: true

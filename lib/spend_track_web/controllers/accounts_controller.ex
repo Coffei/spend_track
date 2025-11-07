@@ -3,6 +3,7 @@ defmodule SpendTrackWeb.AccountsController do
 
   alias SpendTrack.Accounts
   alias SpendTrack.Model.Account
+  alias SpendTrack.Payments
 
   def index(%{assigns: %{current_user: current_user}} = conn, _params) do
     accounts = Accounts.list_accounts(current_user.id)
@@ -11,6 +12,13 @@ defmodule SpendTrackWeb.AccountsController do
       accounts: accounts,
       form: Phoenix.Component.to_form(Accounts.change_account(%Account{}), as: :account)
     )
+  end
+
+  def show(%{assigns: %{current_user: current_user}} = conn, %{"id" => id}) do
+    account = Accounts.get_account!(id, current_user.id)
+    payments = Payments.list_payments_by(account_id: account.id)
+
+    render(conn, :show, account: account, payments: payments)
   end
 
   def create(%{assigns: %{current_user: current_user}} = conn, %{"account" => account_params}) do

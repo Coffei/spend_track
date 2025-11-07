@@ -37,7 +37,12 @@
         <li class="flex items-center gap-3 py-3">
           <span class="inline-block size-6 rounded" style={"background-color: #{account.color}"}>
           </span>
-          <span>{account.name}</span>
+          <.link
+            navigate={~p"/accounts/#{account}"}
+            class="text-sm font-medium text-gray-900 hover:text-blue-600"
+          >
+            {account.name}
+          </.link>
           <div class="ml-auto space-x-2">
             <.link
               navigate={~p"/accounts/#{account}/edit"}

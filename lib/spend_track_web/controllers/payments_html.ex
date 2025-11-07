@@ -3,8 +3,77 @@ defmodule SpendTrackWeb.PaymentsHTML do
 
   embed_templates "payments_html/*"
 
+  attr :payments, :list, required: true
+  attr :show_account, :boolean, default: true
+
+  def payment_list(assigns) do
+    ~H"""
+    <%= if Enum.empty?(@payments) do %>
+      <p class="text-gray-600">No payments yet.</p>
+    <% else %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <%= if @show_account do %>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Account
+                </th>
+              <% end %>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Counterparty
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Time
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Amount
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Currency
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <%= for payment <- @payments do %>
+              <tr class="hover:bg-gray-50">
+                <%= if @show_account do %>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div class="flex items-center gap-2">
+                      <span
+                        class="inline-block size-6 rounded"
+                        style={"background-color: #{payment.account.color}"}
+                      />
+                      <span>{payment.account.name}</span>
+                    </div>
+                  </td>
+                <% end %>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {payment.counterparty}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {DateTime.to_string(payment.time)
+                  |> String.replace("T", " ")
+                  |> String.slice(0, 16)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {Decimal.to_float(payment.amount)}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  {payment.currency}
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+    """
+  end
+
   attr :form, :any, required: true
   attr :accounts, :list, required: true
+  attr :account_id, :integer, default: nil
   attr :id, :string, default: nil
   attr :action, :string, required: true
   attr :method, :string, default: "post"
@@ -22,6 +91,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
       method={@method}
       class={@class}
     >
+      <.input type="hidden" name="account_id" value={@account_id} />
       <.input
         field={f[:account_id]}
         type="select"

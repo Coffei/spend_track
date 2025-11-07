@@ -36,6 +36,7 @@ defmodule SpendTrackWeb.Router do
     get "/accounts", AccountsController, :index
     post "/accounts", AccountsController, :create
     get "/accounts/:id/edit", AccountsController, :edit
+    get "/accounts/:id", AccountsController, :show
     patch "/accounts/:id", AccountsController, :update
     delete "/accounts/:id", AccountsController, :delete
 
