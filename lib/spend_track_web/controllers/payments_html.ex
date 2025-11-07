@@ -4,6 +4,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
   embed_templates "payments_html/*"
 
   attr :payments, :list, required: true
+  attr :account_id, :integer, default: nil
   attr :show_account, :boolean, default: true
 
   def payment_list(assigns) do
@@ -31,6 +32,9 @@ defmodule SpendTrackWeb.PaymentsHTML do
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Currency
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
               </th>
             </tr>
           </thead>
@@ -61,6 +65,18 @@ defmodule SpendTrackWeb.PaymentsHTML do
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {payment.currency}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                  <.link
+                    href={
+                      ~p"/payments/#{payment.id}?#{if @account_id, do: %{account_id: @account_id}, else: %{}}"
+                    }
+                    method="delete"
+                    class="text-red-600 hover:text-red-700 font-medium"
+                    data-confirm="Are you sure?"
+                  >
+                    Delete
+                  </.link>
                 </td>
               </tr>
             <% end %>

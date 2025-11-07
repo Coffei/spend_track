@@ -57,4 +57,33 @@ defmodule SpendTrackWeb.PaymentsController do
         )
     end
   end
+
+  def delete(%{assigns: %{current_user: current_user}} = conn, %{"id" => id} = params) do
+    payments = Payments.list_payments_by(id: String.to_integer(id), user_id: current_user.id)
+
+    redirect_to =
+      if params["account_id"] not in ["", nil],
+        do: ~p"/accounts/#{params["account_id"]}",
+        else: ~p"/payments"
+
+    case payments do
+      [payment] ->
+        case Payments.delete_payment(payment) do
+          {:ok, _} ->
+            conn
+            |> put_flash(:info, "Payment deleted successfully.")
+            |> redirect(to: redirect_to)
+
+          {:error, _} ->
+            conn
+            |> put_flash(:error, "Could not delete payment.")
+            |> redirect(to: redirect_to)
+        end
+
+      _ ->
+        conn
+        |> put_flash(:error, "Payment not found.")
+        |> redirect(to: redirect_to)
+    end
+  end
 end

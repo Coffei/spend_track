@@ -43,6 +43,7 @@ defmodule SpendTrackWeb.Router do
     get "/payments", PaymentsController, :index
     get "/payments/new", PaymentsController, :new
     post "/payments", PaymentsController, :create
+    delete "/payments/:id", PaymentsController, :delete
   end
 
   # Other scopes may use custom stacks.
