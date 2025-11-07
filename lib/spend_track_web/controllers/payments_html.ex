@@ -16,70 +16,67 @@ defmodule SpendTrackWeb.PaymentsHTML do
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <%= if @show_account do %>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Account
-                </th>
-              <% end %>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Counterparty
+              <th
+                :if={@show_account}
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Account
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Time
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Counterparty & Note
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-right text-gray-500 uppercase tracking-wider">
                 Amount
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Currency
-              </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-right text-gray-500 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <%= for payment <- @payments do %>
-              <tr class="hover:bg-gray-50">
-                <%= if @show_account do %>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    <div class="flex items-center gap-2">
-                      <span
-                        class="inline-block size-6 rounded"
-                        style={"background-color: #{payment.account.color}"}
-                      />
-                      <span>{payment.account.name}</span>
-                    </div>
-                  </td>
-                <% end %>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {payment.counterparty}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {DateTime.to_string(payment.time)
-                  |> String.replace("T", " ")
-                  |> String.slice(0, 16)}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {Decimal.to_float(payment.amount)}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {payment.currency}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <tr :for={payment <- @payments} class="hover:bg-gray-50">
+              <td :if={@show_account} class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div class="flex items-center gap-2">
+                  <span
+                    class="inline-block size-6 rounded"
+                    style={"background-color: #{payment.account.color}"}
+                  />
                   <.link
-                    href={
-                      ~p"/payments/#{payment.id}?#{if @account_id, do: %{account_id: @account_id}, else: %{}}"
-                    }
-                    method="delete"
-                    class="text-red-600 hover:text-red-700 font-medium"
-                    data-confirm="Are you sure?"
+                    navigate={~p"/accounts/#{payment.account}"}
+                    class="text-sm font-medium text-gray-900 hover:text-blue-600"
                   >
-                    Delete
+                    {payment.account.name}
                   </.link>
-                </td>
-              </tr>
-            <% end %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                {DateTime.to_string(payment.time)
+                |> String.replace("T", " ")
+                |> String.slice(0, 16)}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <p>{payment.counterparty}</p>
+                <p class="text-small text-gray-700">{payment.note}</p>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
+                {payment.amount} {payment.currency}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <.link
+                  href={
+                    ~p"/payments/#{payment.id}?#{if @account_id, do: %{account_id: @account_id}, else: %{}}"
+                  }
+                  method="delete"
+                  class="text-red-600 hover:text-red-700 font-medium"
+                  data-confirm="Are you sure?"
+                >
+                  Delete
+                </.link>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
