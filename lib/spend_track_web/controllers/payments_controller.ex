@@ -58,6 +58,80 @@ defmodule SpendTrackWeb.PaymentsController do
     end
   end
 
+  def edit(%{assigns: %{current_user: current_user}} = conn, %{"id" => id} = params) do
+    payments = Payments.list_payments_by(id: String.to_integer(id), user_id: current_user.id)
+    accounts = Accounts.list_accounts(current_user.id)
+    account_id = params["account_id"]
+
+    case payments do
+      [payment] ->
+        render(conn, :edit,
+          payment: payment,
+          accounts: accounts,
+          account_id: account_id,
+          form:
+            Phoenix.Component.to_form(
+              Payments.change_payment(payment),
+              as: :payment
+            )
+        )
+
+      _ ->
+        redirect_to =
+          if account_id not in ["", nil],
+            do: ~p"/accounts/#{account_id}",
+            else: ~p"/payments"
+
+        conn
+        |> put_flash(:error, "Payment not found.")
+        |> redirect(to: redirect_to)
+    end
+  end
+
+  def update(
+        %{assigns: %{current_user: current_user}} = conn,
+        %{"id" => id, "payment" => payment_params} = params
+      ) do
+    payments = Payments.list_payments_by(id: String.to_integer(id), user_id: current_user.id)
+    account_id = params["account_id"] || payment_params["account_id"]
+
+    redirect_to =
+      if account_id not in ["", nil],
+        do: ~p"/accounts/#{account_id}",
+        else: ~p"/payments"
+
+    case payments do
+      [payment] ->
+        attrs =
+          payment_params
+          |> Map.take(["time", "amount", "currency", "note", "counterparty", "account_id"])
+
+        case Payments.update_payment(payment, attrs) do
+          {:ok, _payment} ->
+            conn
+            |> put_flash(:info, "Payment updated successfully.")
+            |> redirect(to: redirect_to)
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            accounts = Accounts.list_accounts(current_user.id)
+
+            conn
+            |> put_flash(:error, "Could not update payment.")
+            |> render(:edit,
+              payment: payment,
+              accounts: accounts,
+              account_id: account_id,
+              form: Phoenix.Component.to_form(changeset, as: :payment)
+            )
+        end
+
+      _ ->
+        conn
+        |> put_flash(:error, "Payment not found.")
+        |> redirect(to: redirect_to)
+    end
+  end
+
   def delete(%{assigns: %{current_user: current_user}} = conn, %{"id" => id} = params) do
     payments = Payments.list_payments_by(id: String.to_integer(id), user_id: current_user.id)
 

@@ -1,0 +1,14 @@
+<div class="max-w-2xl mx-auto py-6">
+  <h1 class="text-2xl font-semibold mb-4">Edit Payment</h1>
+
+  <.payment_form
+    id="edit-payment-form"
+    form={@form}
+    accounts={@accounts}
+    account_id={@account_id}
+    action={~p"/payments/#{@payment.id}"}
+    method="patch"
+    submit_label="Save changes"
+  />
+</div>
+

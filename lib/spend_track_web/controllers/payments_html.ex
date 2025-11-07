@@ -65,16 +65,26 @@ defmodule SpendTrackWeb.PaymentsHTML do
                 {payment.amount} {payment.currency}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
-                <.link
-                  href={
-                    ~p"/payments/#{payment.id}?#{if @account_id, do: %{account_id: @account_id}, else: %{}}"
-                  }
-                  method="delete"
-                  class="text-red-600 hover:text-red-700 font-medium"
-                  data-confirm="Are you sure?"
-                >
-                  Delete
-                </.link>
+                <div class="flex items-center justify-end gap-4">
+                  <.link
+                    navigate={
+                      ~p"/payments/#{payment.id}/edit?#{if @account_id, do: %{account_id: @account_id}, else: %{}}"
+                    }
+                    class="text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Edit
+                  </.link>
+                  <.link
+                    href={
+                      ~p"/payments/#{payment.id}?#{if @account_id, do: %{account_id: @account_id}, else: %{}}"
+                    }
+                    method="delete"
+                    class="text-red-600 hover:text-red-700 font-medium"
+                    data-confirm="Are you sure?"
+                  >
+                    Delete
+                  </.link>
+                </div>
               </td>
             </tr>
           </tbody>
