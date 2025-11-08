@@ -6,6 +6,7 @@ defmodule SpendTrack.Model.Category do
           id: integer() | nil,
           name: String.t() | nil,
           color: String.t() | nil,
+          payment_count: integer() | nil,
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }
@@ -13,6 +14,7 @@ defmodule SpendTrack.Model.Category do
   schema "categories" do
     field :name, :string
     field :color, :string
+    field :payment_count, :integer, virtual: true
 
     has_many :payments, SpendTrack.Model.Payment
 

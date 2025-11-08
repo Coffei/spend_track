@@ -29,36 +29,43 @@
       </:cancel>
     </.category_form>
   </div>
-  <%= if Enum.empty?(@categories) do %>
-    <p class="text-gray-600">No categories yet.</p>
-  <% else %>
-    <ul class="divide-y divide-gray-200">
-      <%= for category <- @categories do %>
-        <li class="flex items-center gap-3 py-3">
-          <span class="inline-block size-6 rounded" style={"background-color: #{category.color}"}>
-          </span>
-          <span class="text-sm font-medium text-gray-900">
-            {category.name}
-          </span>
-          <div class="ml-auto space-x-2">
-            <.link
-              navigate={~p"/categories/#{category}/edit"}
-              class="text-sm font-medium text-blue-600 hover:text-blue-700"
-            >
-              Edit
-            </.link>
-            <.link
-              href={~p"/categories/#{category}"}
-              method="delete"
-              data-confirm="Are you sure?"
-              class="text-sm font-medium text-red-600 hover:text-red-700"
-            >
-              Delete
-            </.link>
-          </div>
-        </li>
-      <% end %>
-    </ul>
-  <% end %>
+  <ul class="divide-y divide-gray-200">
+    <li :for={category <- @categories} class="flex items-center gap-3 py-3">
+      <span class="inline-block size-6 rounded" style={"background-color: #{category.color}"}>
+      </span>
+      <span class=" font-medium text-gray-900">
+        <span>
+          {category.name}
+        </span>
+        <span class="text-sm text-gray-600">
+          ({category.payment_count} payments)
+        </span>
+      </span>
+      <div class="ml-auto space-x-2">
+        <.link
+          navigate={~p"/categories/#{category}/edit"}
+          class="text-sm font-medium text-blue-600 hover:text-blue-700"
+        >
+          Edit
+        </.link>
+        <.link
+          href={~p"/categories/#{category}"}
+          method="delete"
+          data-confirm="Are you sure?"
+          class="text-sm font-medium text-red-600 hover:text-red-700"
+        >
+          Delete
+        </.link>
+      </div>
+    </li>
+    <li class="flex items-center gap-3 py-3">
+      <span class="inline-block size-6 rounded bg-gray-300" />
+      <span class="font-medium text-gray-600">
+        Other
+      </span>
+      <span class="text-sm text-gray-600">
+        ({@other_payment_count} payments)
+      </span>
+    </li>
+  </ul>
 </div>
-

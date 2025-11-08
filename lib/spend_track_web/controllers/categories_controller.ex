@@ -9,6 +9,7 @@ defmodule SpendTrackWeb.CategoriesController do
 
     render(conn, :index,
       categories: categories,
+      other_payment_count: Categories.count_other_payments(),
       form: Phoenix.Component.to_form(Categories.change_category(%Category{}), as: :category)
     )
   end
