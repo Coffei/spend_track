@@ -1,7 +1,7 @@
 defmodule SpendTrackWeb.AccountsHTML do
   use SpendTrackWeb, :html
 
-  import SpendTrackWeb.PaymentsHTML
+  import SpendTrackWeb.PaymentsHTML, only: [payment_list: 1]
 
   embed_templates "accounts_html/*"
 

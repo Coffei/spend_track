@@ -1,0 +1,46 @@
+<div class="max-w-2xl mx-auto py-6">
+  <h1 class="text-2xl font-semibold mb-4">Import Payments</h1>
+
+  <.simple_form
+    for={%{}}
+    as={:import}
+    action={~p"/payments/import"}
+    method="post"
+    multipart={true}
+    class="space-y-4 bg-white"
+  >
+    <.input
+      type="select"
+      name="account_id"
+      label="Account"
+      options={Enum.map(@accounts, &{&1.name, &1.id})}
+      value={@account_id}
+    />
+
+    <.input
+      type="file"
+      name="file"
+      label="CSV File"
+      accept=".csv"
+      value={nil}
+      class={[
+        "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 ",
+        "file:text-sm file:font-semibold file:bg-zinc-900 file:text-white hover:file:bg-zinc-700"
+      ]}
+      required
+    />
+    <p class="mt-1 text-sm text-gray-500">
+      Select a CSV file to import payments from.
+    </p>
+
+    <div class="mt-6 flex items-center gap-4">
+      <.button type="submit">Import Payments</.button>
+      <.link
+        navigate={~p"/payments"}
+        class="px-3 py-2 text-sm font-semibold text-gray-700 hover:text-gray-900"
+      >
+        Cancel
+      </.link>
+    </div>
+  </.simple_form>
+</div>

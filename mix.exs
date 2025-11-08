@@ -56,7 +56,10 @@ defmodule SpendTrack.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:ueberauth, "~> 0.10"},
-      {:ueberauth_google, "~> 0.10"}
+      {:ueberauth_google, "~> 0.10"},
+      {:nimble_csv, "~> 1.3"},
+      {:codepagex, "~> 0.1.13"},
+      {:timex, "~> 3.0"}
     ]
   end
 

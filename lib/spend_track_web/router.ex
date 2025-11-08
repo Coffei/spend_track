@@ -43,6 +43,8 @@ defmodule SpendTrackWeb.Router do
     get "/payments", PaymentsController, :index
     get "/payments/new", PaymentsController, :new
     post "/payments", PaymentsController, :create
+    get "/payments/import", PaymentsController, :import
+    post "/payments/import", PaymentsController, :do_import
     get "/payments/:id/edit", PaymentsController, :edit
     patch "/payments/:id", PaymentsController, :update
     delete "/payments/:id", PaymentsController, :delete

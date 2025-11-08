@@ -58,6 +58,8 @@ config :ueberauth, Ueberauth,
     google: {Ueberauth.Strategy.Google, [default_scope: "email profile"]}
   ]
 
+config :codepagex, :encodings, [:ascii, "VENDORS/MICSFT/WINDOWS/CP1250"]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"

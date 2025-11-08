@@ -76,8 +76,65 @@ defmodule SpendTrack.Payments do
 
     base
     |> where(^dynamic)
-    |> order_by(desc: :time)
+    |> order_by(desc: :time, asc: :counterparty, asc: :amount)
     |> limit(100)
     |> Repo.all()
+  end
+
+  @doc """
+  Import a list of payments, deduplicating based on time, amount, currency, and counterparty.
+
+  Returns a tuple with the count of imported payments and the count of skipped duplicates.
+  """
+  @spec import_payments([map()], integer()) ::
+          {:ok, integer(), integer()} | {:error, Ecto.Changeset.t()}
+  def import_payments(payment_maps, account_id)
+      when is_list(payment_maps) and is_integer(account_id) do
+    # Get existing payments for this account to check for duplicates
+    # Use a normalized key format for comparison (convert Decimal to string for MapSet)
+    existing_payments =
+      from(p in Payment,
+        where: p.account_id == ^account_id,
+        select: {p.time, p.amount, p.currency, p.counterparty}
+      )
+      |> Repo.all()
+      |> Enum.map(fn {time, amount, currency, counterparty} ->
+        {time, Decimal.to_float(amount), currency, counterparty}
+      end)
+      |> MapSet.new()
+
+    # Deduplicate: filter out payments that already exist
+    {new_payments, skipped} =
+      Enum.reduce(payment_maps, {[], 0}, fn payment_map, {acc, skipped_count} ->
+        time = payment_map[:time]
+        amount = Decimal.to_float(payment_map[:amount])
+        currency = payment_map[:currency]
+        counterparty = payment_map[:counterparty]
+
+        key = {time, amount, currency, counterparty}
+
+        if MapSet.member?(existing_payments, key) do
+          {acc, skipped_count + 1}
+        else
+          attrs = Map.put(payment_map, :account_id, account_id)
+          {[attrs | acc], skipped_count}
+        end
+      end)
+
+    # Insert all new payments in a transaction
+    result =
+      Repo.transaction(fn ->
+        Enum.map(new_payments, fn attrs ->
+          case create_payment(attrs) do
+            {:ok, payment} -> payment
+            {:error, changeset} -> Repo.rollback(changeset)
+          end
+        end)
+      end)
+
+    case result do
+      {:ok, _payments} -> {:ok, length(new_payments), skipped}
+      {:error, changeset} -> {:error, changeset}
+    end
   end
 end

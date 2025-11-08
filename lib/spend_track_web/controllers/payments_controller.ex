@@ -4,6 +4,7 @@ defmodule SpendTrackWeb.PaymentsController do
   alias SpendTrack.Payments
   alias SpendTrack.Accounts
   alias SpendTrack.Model.Payment
+  alias SpendTrack.Import
 
   def index(%{assigns: %{current_user: current_user}} = conn, _params) do
     payments = Payments.list_payments_by(user_id: current_user.id)
@@ -159,5 +160,64 @@ defmodule SpendTrackWeb.PaymentsController do
         |> put_flash(:error, "Payment not found.")
         |> redirect(to: redirect_to)
     end
+  end
+
+  def import(%{assigns: %{current_user: current_user}} = conn, params) do
+    accounts = Accounts.list_accounts(current_user.id)
+    account_id = params["account_id"]
+
+    render(conn, :import,
+      accounts: accounts,
+      account_id: account_id && String.to_integer(account_id)
+    )
+  end
+
+  def do_import(%{assigns: %{current_user: current_user}} = conn, %{
+        "file" => %Plug.Upload{} = upload,
+        "account_id" => account_id
+      }) do
+    account_id = String.to_integer(account_id)
+
+    # Verify account belongs to user
+    try do
+      Accounts.get_account!(account_id, current_user.id)
+
+      # Read and parse the CSV file
+      csv_content = File.read!(upload.path)
+
+      case Import.csv_to_payments(csv_content) do
+        {:ok, payment_maps} ->
+          case Payments.import_payments(payment_maps, account_id) do
+            {:ok, imported_count, skipped_count} ->
+              conn
+              |> put_flash(
+                :info,
+                "Imported #{imported_count} payment(s). #{skipped_count} duplicate(s) skipped."
+              )
+              |> redirect(to: ~p"/accounts/#{account_id}")
+
+            {:error, changeset} ->
+              conn
+              |> put_flash(:error, "Error importing payments: #{inspect(changeset.errors)}")
+              |> redirect(to: ~p"/payments/import")
+          end
+
+        {:error, reason} ->
+          conn
+          |> put_flash(:error, "Failed to parse CSV file: #{reason}.")
+          |> redirect(to: ~p"/payments/import")
+      end
+    rescue
+      Ecto.NoResultsError ->
+        conn
+        |> put_flash(:error, "Account not found.")
+        |> redirect(to: ~p"/payments/import")
+    end
+  end
+
+  def do_import(conn, _params) do
+    conn
+    |> put_flash(:error, "Please select a file and account.")
+    |> redirect(to: ~p"/payments/import")
   end
 end
