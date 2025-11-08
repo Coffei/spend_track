@@ -1,0 +1,21 @@
+<div class="max-w-2xl mx-auto py-6">
+  <h1 class="text-2xl font-semibold mb-4">Edit category</h1>
+
+  <.category_form
+    id="edit-category-form"
+    form={@form}
+    action={~p"/categories/#{@category}"}
+    method="patch"
+    submit_label="Save changes"
+  >
+    <:cancel>
+      <.link
+        navigate={~p"/categories"}
+        class="ml-2 text-sm font-medium text-zinc-600 hover:text-zinc-900"
+      >
+        Cancel
+      </.link>
+    </:cancel>
+  </.category_form>
+</div>
+

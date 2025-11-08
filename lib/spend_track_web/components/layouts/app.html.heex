@@ -21,6 +21,13 @@
       >
         Payments
       </.link>
+      <.link
+        :if={@current_user}
+        href={~p"/categories"}
+        class="font-medium rounded-lg px-2 py-1 hover:bg-zinc-200/80"
+      >
+        Categories
+      </.link>
     </div>
     <div class="flex items-center gap-4 font-semibold leading-6 text-zinc-900">
       <a href="https://github.com/phoenixframework/phoenix" class="hover:text-zinc-700">
