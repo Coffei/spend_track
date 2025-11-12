@@ -1,0 +1,42 @@
+<div class="max-w-2xl mx-auto py-6">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-semibold">Rules</h1>
+
+    <.link
+      navigate={~p"/rules/new"}
+      class="px-4 py-2 bg-zinc-900 text-white rounded-md hover:bg-zinc-700"
+    >
+      Add new rule
+    </.link>
+  </div>
+
+  <ul class="divide-y divide-gray-200">
+    <li :for={rule <- @rules} class="flex items-center gap-3 py-3">
+      <div
+        class="inline-block size-6 rounded"
+        style={"background-color: #{rule.category.color}"}
+      />
+      <span>{rule.category.name}</span>
+      <span class="font-medium text-gray-900">{rule.name}</span>
+      <div class="ml-auto space-x-2">
+        <.link
+          navigate={~p"/rules/#{rule.id}/edit"}
+          class="text-sm font-medium text-blue-600 hover:text-blue-700"
+        >
+          Edit
+        </.link>
+        <.link
+          href={~p"/rules/#{rule.id}"}
+          method="delete"
+          data-confirm="Are you sure?"
+          class="text-sm font-medium text-red-600 hover:text-red-700"
+        >
+          Delete
+        </.link>
+      </div>
+    </li>
+    <li :if={Enum.empty?(@rules)} class="py-3 text-gray-600">
+      No rules yet.
+    </li>
+  </ul>
+</div>
