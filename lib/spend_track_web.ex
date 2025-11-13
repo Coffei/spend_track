@@ -53,6 +53,9 @@ defmodule SpendTrackWeb do
       use Phoenix.LiveView,
         layout: {SpendTrackWeb.Layouts, :app}
 
+      on_mount {SpendTrackWeb.Live.Auth, :fetch_current_user}
+      on_mount {SpendTrackWeb.Live.Auth, :require_user}
+
       unquote(html_helpers())
     end
   end

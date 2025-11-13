@@ -6,10 +6,11 @@ defmodule SpendTrackWeb.RulesHTML do
   attr :form, :any, required: true
   attr :categories, :list, required: true
   attr :id, :string, default: nil
-  attr :action, :string, required: true
   attr :method, :string, default: "post"
   attr :class, :string, default: nil
   attr :submit_label, :string
+  attr :phx_change, :string, default: nil
+  attr :phx_submit, :string, default: nil
   slot :cancel
 
   def rule_form(assigns) do
@@ -21,8 +22,8 @@ defmodule SpendTrackWeb.RulesHTML do
       id={@id}
       for={@form}
       as={:rule}
-      action={@action}
-      method={@method}
+      phx-change={@phx_change}
+      phx-submit={@phx_submit}
       class={@class}
     >
       <.input field={f[:name]} label="Name" type="text" />

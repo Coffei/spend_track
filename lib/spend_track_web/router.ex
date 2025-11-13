@@ -33,34 +33,34 @@ defmodule SpendTrackWeb.Router do
     pipe_through :browser
     pipe_through :authenticated
 
-    get "/accounts", AccountsController, :index
-    post "/accounts", AccountsController, :create
-    get "/accounts/:id/edit", AccountsController, :edit
-    get "/accounts/:id", AccountsController, :show
-    patch "/accounts/:id", AccountsController, :update
-    delete "/accounts/:id", AccountsController, :delete
+    live_session :authenticated do
+      get "/accounts", AccountsController, :index
+      post "/accounts", AccountsController, :create
+      get "/accounts/:id/edit", AccountsController, :edit
+      get "/accounts/:id", AccountsController, :show
+      patch "/accounts/:id", AccountsController, :update
+      delete "/accounts/:id", AccountsController, :delete
 
-    get "/payments", PaymentsController, :index
-    get "/payments/new", PaymentsController, :new
-    post "/payments", PaymentsController, :create
-    get "/payments/import", PaymentsController, :import
-    post "/payments/import", PaymentsController, :do_import
-    get "/payments/:id/edit", PaymentsController, :edit
-    patch "/payments/:id", PaymentsController, :update
-    delete "/payments/:id", PaymentsController, :delete
+      get "/payments", PaymentsController, :index
+      get "/payments/new", PaymentsController, :new
+      post "/payments", PaymentsController, :create
+      get "/payments/import", PaymentsController, :import
+      post "/payments/import", PaymentsController, :do_import
+      get "/payments/:id/edit", PaymentsController, :edit
+      patch "/payments/:id", PaymentsController, :update
+      delete "/payments/:id", PaymentsController, :delete
 
-    get "/categories", CategoriesController, :index
-    post "/categories", CategoriesController, :create
-    get "/categories/:id/edit", CategoriesController, :edit
-    patch "/categories/:id", CategoriesController, :update
-    delete "/categories/:id", CategoriesController, :delete
+      get "/categories", CategoriesController, :index
+      post "/categories", CategoriesController, :create
+      get "/categories/:id/edit", CategoriesController, :edit
+      patch "/categories/:id", CategoriesController, :update
+      delete "/categories/:id", CategoriesController, :delete
 
-    get "/rules", RulesController, :index
-    get "/rules/new", RulesController, :new
-    post "/rules", RulesController, :create
-    get "/rules/:id/edit", RulesController, :edit
-    patch "/rules/:id", RulesController, :update
-    delete "/rules/:id", RulesController, :delete
+      get "/rules", RulesController, :index
+      live "/rules/new", RuleLive.Form, :new
+      live "/rules/:id/edit", RuleLive.Form, :edit
+      delete "/rules/:id", RulesController, :delete
+    end
   end
 
   # Other scopes may use custom stacks.
