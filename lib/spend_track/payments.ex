@@ -51,7 +51,7 @@ defmodule SpendTrack.Payments do
   - Ranges: :time_gte, :time_lte, :amount_gte, :amount_lte
   """
   @spec list_payments_by(Keyword.t()) :: [Payment.t()]
-  def list_payments_by(conditions \\ []) when is_list(conditions) do
+  def list_payments_by(conditions \\ [], limit \\ 100) when is_list(conditions) do
     base =
       from(p in Payment,
         join: a in assoc(p, :account),
@@ -62,6 +62,8 @@ defmodule SpendTrack.Payments do
       Enum.reduce(conditions, true, fn
         {:id, v}, dyn -> dynamic([p], ^dyn and p.id == ^v)
         {:account_id, v}, dyn -> dynamic([p], ^dyn and p.account_id == ^v)
+        {:category_id, nil}, dyn -> dynamic([p], ^dyn and is_nil(p.category_id))
+        {:category_id, v}, dyn -> dynamic([p], ^dyn and p.category_id == ^v)
         {:currency, v}, dyn -> dynamic([p], ^dyn and p.currency == ^v)
         {:counterparty, v}, dyn -> dynamic([p], ^dyn and p.counterparty == ^v)
         {:time, v}, dyn -> dynamic([p], ^dyn and p.time == ^v)
@@ -77,7 +79,7 @@ defmodule SpendTrack.Payments do
     base
     |> where(^dynamic)
     |> order_by(desc: :time, asc: :counterparty, asc: :amount)
-    |> limit(100)
+    |> limit(^limit)
     |> Repo.all()
   end
 

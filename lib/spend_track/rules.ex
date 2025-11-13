@@ -42,4 +42,30 @@ defmodule SpendTrack.Rules do
   def change_rule(%Rule{} = rule, attrs \\ %{}) do
     Rule.changeset(rule, attrs)
   end
+
+  @spec find_matching_payments(Rule.t(), integer()) :: [Payment.t()]
+  def find_matching_payments(rule, limit \\ 20) do
+    query = from(p in Payment)
+
+    query =
+      if rule.counterparty_filter not in [nil, ""] do
+        from(p in query, where: like(p.counterparty, ^"%#{rule.counterparty_filter}%"))
+      else
+        query
+      end
+
+    query =
+      if rule.note_filter not in [nil, ""] do
+        from(p in query, where: like(p.note, ^"%#{rule.note_filter}%"))
+      else
+        query
+      end
+
+    from(p in query,
+      limit: ^limit,
+      order_by: [desc: p.time, asc: p.counterparty, asc: p.amount],
+      preload: [:account]
+    )
+    |> Repo.all()
+  end
 end

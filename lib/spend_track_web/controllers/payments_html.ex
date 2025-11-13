@@ -6,6 +6,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
   attr :payments, :list, required: true
   attr :account_id, :integer, default: nil
   attr :show_account, :boolean, default: true
+  attr :show_actions, :boolean, default: true
 
   def payment_list(assigns) do
     ~H"""
@@ -31,7 +32,10 @@ defmodule SpendTrackWeb.PaymentsHTML do
               <th class="px-6 py-3 text-left text-xs font-medium text-right text-gray-500 uppercase tracking-wider">
                 Amount
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-right text-gray-500 uppercase tracking-wider">
+              <th
+                :if={@show_actions}
+                class="px-6 py-3 text-left text-xs font-medium text-right text-gray-500 uppercase tracking-wider"
+              >
                 Actions
               </th>
             </tr>
@@ -66,7 +70,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                 {payment.amount} {payment.currency}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+              <td :if={@show_actions} class="px-6 py-4 whitespace-nowrap text-right text-sm">
                 <div class="flex items-center justify-end gap-4">
                   <.link
                     navigate={
