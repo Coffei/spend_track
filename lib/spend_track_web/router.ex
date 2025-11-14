@@ -53,6 +53,7 @@ defmodule SpendTrackWeb.Router do
       get "/categories", CategoriesController, :index
       post "/categories", CategoriesController, :create
       get "/categories/:id/edit", CategoriesController, :edit
+      get "/categories/:id", CategoriesController, :show
       patch "/categories/:id", CategoriesController, :update
       delete "/categories/:id", CategoriesController, :delete
 

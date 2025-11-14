@@ -1,0 +1,16 @@
+<div class="max-w-6xl mx-auto py-6">
+  <div class="flex items-center justify-between mb-4">
+    <h1 class="text-2xl font-semibold">
+      <%= if @category do %>
+        Category: {@category.name}
+      <% else %>
+        Other payments
+      <% end %>
+    </h1>
+  </div>
+
+  <SpendTrackWeb.PaymentsHTML.payment_list
+    payments={@payments}
+    show_category={false}
+  />
+</div>

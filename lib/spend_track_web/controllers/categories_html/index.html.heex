@@ -33,14 +33,14 @@
     <li :for={category <- @categories} class="flex items-center gap-3 py-3">
       <span class="inline-block size-6 rounded" style={"background-color: #{category.color}"}>
       </span>
-      <span class=" font-medium text-gray-900">
+      <.link navigate={~p"/categories/#{category}"} class="font-medium text-gray-900 hover:text-blue-600">
         <span>
           {category.name}
         </span>
         <span class="text-sm text-gray-600">
           ({category.payment_count} payments)
         </span>
-      </span>
+      </.link>
       <div class="ml-auto space-x-2">
         <.link
           navigate={~p"/categories/#{category}/edit"}
@@ -60,9 +60,9 @@
     </li>
     <li class="flex items-center gap-3 py-3">
       <span class="inline-block size-6 rounded bg-gray-300" />
-      <span class="font-medium text-gray-600">
+      <.link navigate={~p"/categories/other"} class="font-medium text-gray-600 hover:text-blue-600">
         Other
-      </span>
+      </.link>
       <span class="text-sm text-gray-600">
         ({@other_payment_count} payments)
       </span>

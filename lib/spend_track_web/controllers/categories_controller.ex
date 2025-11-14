@@ -3,6 +3,7 @@ defmodule SpendTrackWeb.CategoriesController do
 
   alias SpendTrack.Categories
   alias SpendTrack.Model.Category
+  alias SpendTrack.Payments
 
   def index(conn, _params) do
     categories = Categories.list_categories()
@@ -12,6 +13,17 @@ defmodule SpendTrackWeb.CategoriesController do
       other_payment_count: Categories.count_other_payments(),
       form: Phoenix.Component.to_form(Categories.change_category(%Category{}), as: :category)
     )
+  end
+
+  def show(conn, %{"id" => "other"}) do
+    payments = Payments.list_payments_by([category_id: nil], 1000)
+    render(conn, "show.html", payments: payments, category: nil)
+  end
+
+  def show(conn, %{"id" => id}) do
+    category = Categories.get_category!(id)
+    payments = Payments.list_payments_by([category_id: category.id], 1000)
+    render(conn, "show.html", payments: payments, category: category)
   end
 
   def create(conn, %{"category" => category_params}) do
