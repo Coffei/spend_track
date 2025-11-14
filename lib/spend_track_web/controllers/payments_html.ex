@@ -7,6 +7,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
   attr :account_id, :integer, default: nil
   attr :show_account, :boolean, default: true
   attr :show_actions, :boolean, default: true
+  attr :show_category, :boolean, default: true
 
   def payment_list(assigns) do
     ~H"""
@@ -31,6 +32,12 @@ defmodule SpendTrackWeb.PaymentsHTML do
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-right text-gray-500 uppercase tracking-wider">
                 Amount
+              </th>
+              <th
+                :if={@show_category}
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+              >
+                Category
               </th>
               <th
                 :if={@show_actions}
@@ -63,12 +70,22 @@ defmodule SpendTrackWeb.PaymentsHTML do
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <p>{payment.counterparty}</p>
-                <p class="text-small text-gray-700 max-w-[30rem] overflow-hidden text-ellipsis whitespace-nowrap">
+                <p class="text-small text-gray-700 max-w-[20rem] overflow-hidden text-ellipsis whitespace-nowrap">
                   {payment.note}
                 </p>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
                 {payment.amount} {payment.currency}
+              </td>
+              <td :if={@show_category} class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <div :if={payment.category} class="flex items-center gap-2">
+                  <span
+                    class="inline-block size-4 rounded"
+                    style={"background-color: #{payment.category.color}"}
+                  />
+                  <span>{payment.category.name}</span>
+                </div>
+                <span :if={!payment.category} class="text-gray-400">—</span>
               </td>
               <td :if={@show_actions} class="px-6 py-4 whitespace-nowrap text-right text-sm">
                 <div class="flex items-center justify-end gap-4">

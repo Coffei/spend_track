@@ -85,7 +85,8 @@ defmodule SpendTrack.Payments do
     base =
       from(p in Payment,
         join: a in assoc(p, :account),
-        preload: [account: a]
+        left_join: c in assoc(p, :category),
+        preload: [account: a, category: c]
       )
 
     dynamic =

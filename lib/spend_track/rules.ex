@@ -94,7 +94,7 @@ defmodule SpendTrack.Rules do
     from(p in query,
       limit: ^limit,
       order_by: [desc: p.time, asc: p.counterparty, asc: p.amount],
-      preload: [:account]
+      preload: [:account, :category]
     )
     |> Repo.all()
   end

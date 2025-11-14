@@ -128,7 +128,12 @@ defmodule SpendTrackWeb.RuleLive.Form do
       <p class="text-sm text-gray-600 mb-4">
         The first 20 payments without a category will be shown.
       </p>
-      <.payment_list :if={@other_payments != []} payments={@other_payments} show_actions={false} />
+      <.payment_list
+        :if={@other_payments != []}
+        payments={@other_payments}
+        show_actions={false}
+        show_category={false}
+      />
     </div>
     <p :if={@other_payments == []} class="mt-8">All payments are categorized already.</p>
     """
