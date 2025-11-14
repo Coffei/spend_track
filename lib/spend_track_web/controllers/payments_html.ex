@@ -70,7 +70,10 @@ defmodule SpendTrackWeb.PaymentsHTML do
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <p>{payment.counterparty}</p>
-                <p class="text-small text-gray-700 max-w-[20rem] overflow-hidden text-ellipsis whitespace-nowrap">
+                <p
+                  class="text-small text-gray-700 max-w-[20rem] overflow-hidden text-ellipsis whitespace-nowrap"
+                  title={payment.note}
+                >
                   {payment.note}
                 </p>
               </td>
