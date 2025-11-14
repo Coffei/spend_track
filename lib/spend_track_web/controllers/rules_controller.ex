@@ -13,9 +13,11 @@ defmodule SpendTrackWeb.RulesController do
     rule = Rules.get_rule!(id)
 
     case Rules.delete_rule(rule) do
-      {:ok, _} ->
+      {:ok, _, %{applied: set, unapplied: unset}} ->
+        stats_message = "Category set to #{set} payments, and unset from #{unset} payments."
+
         conn
-        |> put_flash(:info, "Rule deleted successfully.")
+        |> put_flash(:info, "Rule deleted successfully. #{stats_message}")
         |> redirect(to: ~p"/rules")
 
       {:error, _} ->

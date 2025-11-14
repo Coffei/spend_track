@@ -3,18 +3,34 @@ defmodule SpendTrack.Payments do
   The Payments context.
   """
 
+  import Ecto.Changeset, only: [get_field: 2, put_change: 3]
   import Ecto.Query, warn: false
   alias SpendTrack.Repo
   alias SpendTrack.Model.Payment
+  alias SpendTrack.Rules
 
   @doc """
   Create a new payment.
   """
   @spec create_payment(map()) :: {:ok, Payment.t()} | {:error, Ecto.Changeset.t()}
   def create_payment(attrs \\ %{}) do
-    %Payment{}
-    |> Payment.changeset(attrs)
-    |> Repo.insert()
+    changeset = Payment.changeset(%Payment{}, attrs)
+
+    temp_payment = %Payment{
+      note: get_field(changeset, :note),
+      counterparty: get_field(changeset, :counterparty)
+    }
+
+    category_id = Rules.find_category_for_payment(temp_payment)
+
+    changeset =
+      if category_id do
+        put_change(changeset, :category_id, category_id)
+      else
+        changeset
+      end
+
+    Repo.insert(changeset)
   end
 
   @doc """
@@ -22,9 +38,23 @@ defmodule SpendTrack.Payments do
   """
   @spec update_payment(Payment.t(), map()) :: {:ok, Payment.t()} | {:error, Ecto.Changeset.t()}
   def update_payment(%Payment{} = payment, attrs) do
-    payment
-    |> Payment.changeset(attrs)
-    |> Repo.update()
+    changeset = Payment.changeset(payment, attrs)
+
+    temp_payment = %Payment{
+      note: get_field(changeset, :note),
+      counterparty: get_field(changeset, :counterparty)
+    }
+
+    category_id = Rules.find_category_for_payment(temp_payment)
+
+    changeset =
+      if category_id != get_field(changeset, :category_id) do
+        put_change(changeset, :category_id, category_id)
+      else
+        changeset
+      end
+
+    Repo.update(changeset)
   end
 
   @doc """
@@ -135,8 +165,12 @@ defmodule SpendTrack.Payments do
       end)
 
     case result do
-      {:ok, _payments} -> {:ok, length(new_payments), skipped}
-      {:error, changeset} -> {:error, changeset}
+      {:ok, _payments} ->
+        Rules.run_all()
+        {:ok, length(new_payments), skipped}
+
+      {:error, changeset} ->
+        {:error, changeset}
     end
   end
 end

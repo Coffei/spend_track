@@ -75,11 +75,13 @@ defmodule SpendTrackWeb.RuleLive.Form do
       end
 
     case result do
-      {:ok, _rule} ->
+      {:ok, _rule, %{applied: set, unapplied: unset}} ->
+        stats_message = "Category set to #{set} payments, and unset from #{unset} payments."
+
         message =
           if socket.assigns.rule.id,
-            do: "Rule updated successfully.",
-            else: "Rule created successfully."
+            do: "Rule updated successfully. #{stats_message}",
+            else: "Rule created successfully. #{stats_message}"
 
         {:noreply,
          socket
