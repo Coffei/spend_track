@@ -61,6 +61,8 @@ defmodule SpendTrackWeb.Router do
       live "/rules/new", RuleLive.Form, :new
       live "/rules/:id/edit", RuleLive.Form, :edit
       delete "/rules/:id", RulesController, :delete
+
+      get "/analytics", AnalyticsController, :index
     end
   end
 

@@ -172,4 +172,53 @@ defmodule SpendTrack.Payments do
         {:error, changeset}
     end
   end
+
+  @spec sum(integer(), DateTime.t(), DateTime.t()) ::
+          {received :: Decimal.t(), spent :: Decimal.t()}
+  def sum(user_id, from, to) do
+    res =
+      from(p in Payment,
+        join: a in assoc(p, :account),
+        where: a.user_id == ^user_id,
+        where: p.time >= ^from,
+        where: p.time <= ^to,
+        select: %{
+          received: filter(sum(p.amount), p.amount > 0),
+          spent: filter(sum(p.amount), p.amount < 0)
+        }
+      )
+      |> Repo.one()
+
+    {res.received || Decimal.new(0), res.spent || Decimal.new(0)}
+  end
+
+  @spec sum_by_category(integer(), DateTime.t(), DateTime.t()) :: [
+          %{name: String.t(), color: String.t(), spent: Decimal.t(), received: Decimal.t()}
+        ]
+  def sum_by_category(user_id, from, to) do
+    from(p in Payment,
+      join: a in assoc(p, :account),
+      left_join: c in assoc(p, :category),
+      where: a.user_id == ^user_id,
+      where: p.time >= ^from,
+      where: p.time <= ^to,
+      group_by: [c.name, c.color],
+      select: %{
+        name: c.name,
+        color: c.color,
+        spent: filter(sum(p.amount), p.amount < 0),
+        received: filter(sum(p.amount), p.amount > 0)
+      }
+    )
+    |> Repo.all()
+    |> Enum.sort_by(&{is_nil(&1.name), &1.name})
+    |> Enum.map(fn %{name: name, color: color, spent: spent, received: received} ->
+      %{
+        name: name,
+        color: color,
+        spent: spent || Decimal.new(0),
+        received: received || Decimal.new(0)
+      }
+    end)
+  end
 end

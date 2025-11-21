@@ -1,0 +1,81 @@
+<div class="mb-8 flex items-center justify-between">
+  <div class="flex items-center gap-4">
+    <.link
+      href={
+        ~p"/analytics?#{[year: Timex.shift(@current_date, months: -1).year, month: Timex.shift(@current_date, months: -1).month]}"
+      }
+      class="rounded-full p-2 hover:bg-zinc-100"
+    >
+      <.icon name="hero-chevron-left" class="h-5 w-5" />
+    </.link>
+    <h1 class="text-2xl font-bold text-zinc-900">
+      {Calendar.strftime(@current_date, "%B %Y")}
+    </h1>
+    <.link
+      href={
+        ~p"/analytics?#{[year: Timex.shift(@current_date, months: 1).year, month: Timex.shift(@current_date, months: 1).month]}"
+      }
+      class="rounded-full p-2 hover:bg-zinc-100"
+    >
+      <.icon name="hero-chevron-right" class="h-5 w-5" />
+    </.link>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8">
+  <div class="rounded-xl bg-zinc-50 p-6 border border-zinc-200">
+    <p class="text-sm font-medium text-zinc-500">Total Received</p>
+    <p class="mt-2 text-3xl font-bold text-green-600">
+      {format_currency(@received)}
+    </p>
+  </div>
+  <div class="rounded-xl bg-zinc-50 p-6 border border-zinc-200">
+    <p class="text-sm font-medium text-zinc-500">Total Spent</p>
+    <p class="mt-2 text-3xl font-bold text-red-600">
+      {format_currency(@spent)}
+    </p>
+  </div>
+</div>
+
+<div class="rounded-xl border border-zinc-200 bg-white shadow-sm">
+  <div class="border-b border-zinc-200 px-6 py-4">
+    <h2 class="text-lg font-semibold text-zinc-900">Category Breakdown</h2>
+  </div>
+  <div class="divide-y divide-zinc-100">
+    <%= if Enum.empty?(@category_sums) do %>
+      <div class="px-6 py-8 text-center text-zinc-500">
+        No data for this month.
+      </div>
+    <% else %>
+      <%= for category <- @category_sums do %>
+        <div class="flex items-center justify-between px-6 py-4 hover:bg-zinc-50">
+          <div :if={category.name} class="flex items-center gap-3">
+            <span
+              class="inline-block size-6 rounded"
+              style={"background-color: #{category.color}"}
+            />
+            <span class="font-medium text-zinc-900">
+              {category.name}
+            </span>
+          </div>
+          <div :if={!category.name} class="flex items-center gap-3">
+            <span class="inline-block size-6 rounded bg-gray-300" />
+            <span class="font-medium text-gray-600">
+              Other
+            </span>
+          </div>
+          <div class="text-right">
+            <div class="font-medium text-zinc-900">
+              {format_currency(category.spent)}
+            </div>
+            <%= if Decimal.gt?(category.received, 0) do %>
+              <div class="text-xs text-green-600">
+                + {format_currency(category.received)}
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
