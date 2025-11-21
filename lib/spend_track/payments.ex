@@ -77,7 +77,7 @@ defmodule SpendTrack.Payments do
   Locate payments by conditions provided as a keyword list.
 
   Supported keys:
-  - Equality: :id, :account_id, :currency, :counterparty, :time, :amount
+  - Equality: :id, :account_id, :counterparty, :time, :amount
   - Ranges: :time_gte, :time_lte, :amount_gte, :amount_lte
   """
   @spec list_payments_by(Keyword.t()) :: [Payment.t()]
@@ -95,7 +95,6 @@ defmodule SpendTrack.Payments do
         {:account_id, v}, dyn -> dynamic([p], ^dyn and p.account_id == ^v)
         {:category_id, nil}, dyn -> dynamic([p], ^dyn and is_nil(p.category_id))
         {:category_id, v}, dyn -> dynamic([p], ^dyn and p.category_id == ^v)
-        {:currency, v}, dyn -> dynamic([p], ^dyn and p.currency == ^v)
         {:counterparty, v}, dyn -> dynamic([p], ^dyn and p.counterparty == ^v)
         {:time, v}, dyn -> dynamic([p], ^dyn and p.time == ^v)
         {:amount, v}, dyn -> dynamic([p], ^dyn and p.amount == ^v)
@@ -115,7 +114,7 @@ defmodule SpendTrack.Payments do
   end
 
   @doc """
-  Import a list of payments, deduplicating based on time, amount, currency, and counterparty.
+  Import a list of payments, deduplicating based on time, amount, and counterparty.
 
   Returns a tuple with the count of imported payments and the count of skipped duplicates.
   """
@@ -128,11 +127,11 @@ defmodule SpendTrack.Payments do
     existing_payments =
       from(p in Payment,
         where: p.account_id == ^account_id,
-        select: {p.time, p.amount, p.currency, p.counterparty}
+        select: {p.time, p.amount, p.counterparty}
       )
       |> Repo.all()
-      |> Enum.map(fn {time, amount, currency, counterparty} ->
-        {time, Decimal.to_float(amount), currency, counterparty}
+      |> Enum.map(fn {time, amount, counterparty} ->
+        {time, Decimal.to_float(amount), counterparty}
       end)
       |> MapSet.new()
 
@@ -141,10 +140,9 @@ defmodule SpendTrack.Payments do
       Enum.reduce(payment_maps, {[], 0}, fn payment_map, {acc, skipped_count} ->
         time = payment_map[:time]
         amount = Decimal.to_float(payment_map[:amount])
-        currency = payment_map[:currency]
         counterparty = payment_map[:counterparty]
 
-        key = {time, amount, currency, counterparty}
+        key = {time, amount, counterparty}
 
         if MapSet.member?(existing_payments, key) do
           {acc, skipped_count + 1}

@@ -9,7 +9,6 @@ defmodule SpendTrack.Model.Payment do
           id: integer() | nil,
           time: DateTime.t() | nil,
           amount: Decimal.t() | nil,
-          currency: String.t() | nil,
           note: String.t() | nil,
           counterparty: String.t() | nil,
           account_id: integer() | nil,
@@ -21,7 +20,6 @@ defmodule SpendTrack.Model.Payment do
   schema "payments" do
     field :time, :utc_datetime
     field :amount, :decimal
-    field :currency, :string
     field :note, :string
     field :counterparty, :string
 
@@ -35,7 +33,7 @@ defmodule SpendTrack.Model.Payment do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(payment, attrs) do
     payment
-    |> cast(attrs, [:time, :amount, :currency, :note, :counterparty, :account_id, :category_id])
-    |> validate_required([:time, :amount, :currency, :counterparty, :account_id])
+    |> cast(attrs, [:time, :amount, :note, :counterparty, :account_id, :category_id])
+    |> validate_required([:time, :amount, :counterparty, :account_id])
   end
 end

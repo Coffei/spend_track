@@ -24,12 +24,11 @@ defmodule SpendTrack.Import do
     end
   end
 
-  defp to_payments(data, time_key, amount_key, currency_key, counterparty_key, note_keys) do
+  defp to_payments(data, time_key, amount_key, counterparty_key, note_keys) do
     Enum.map(data, fn row ->
       %{
         time: date(row[time_key]),
         amount: to_decimal(row[amount_key]),
-        currency: row[currency_key],
         counterparty: row[counterparty_key],
         note:
           Enum.map(note_keys, fn key -> String.trim(row[key]) end)
@@ -101,7 +100,7 @@ defmodule SpendTrack.Import do
     csv_data
     |> Enum.drop_while(fn [cell | _] -> cell != "Datum zauctovani" end)
     |> to_map()
-    |> to_payments("Datum zauctovani", "Castka", "Mena", "Protistrana", [
+    |> to_payments("Datum zauctovani", "Castka", "Protistrana", [
       "Nazev protiuctu",
       "Popis pro me",
       "Zprava pro prijemce"
@@ -111,7 +110,7 @@ defmodule SpendTrack.Import do
   defp transform(csv_data, :rb) do
     csv_data
     |> to_map()
-    |> to_payments("Datum zaúčtování", "Zaúčtovaná částka", "Měna účtu", "Číslo protiúčtu", [
+    |> to_payments("Datum zaúčtování", "Zaúčtovaná částka", "Číslo protiúčtu", [
       "Název obchodníka",
       "Název protiúčtu",
       "Zpráva"

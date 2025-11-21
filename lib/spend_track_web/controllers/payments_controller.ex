@@ -32,7 +32,7 @@ defmodule SpendTrackWeb.PaymentsController do
       ) do
     attrs =
       payment_params
-      |> Map.take(["time", "amount", "currency", "note", "counterparty", "account_id"])
+      |> Map.take(["time", "amount", "note", "counterparty", "account_id"])
 
     case Payments.create_payment(attrs) do
       {:ok, _payment} ->
@@ -105,7 +105,7 @@ defmodule SpendTrackWeb.PaymentsController do
       [payment] ->
         attrs =
           payment_params
-          |> Map.take(["time", "amount", "currency", "note", "counterparty", "account_id"])
+          |> Map.take(["time", "amount", "note", "counterparty", "account_id"])
 
         case Payments.update_payment(payment, attrs) do
           {:ok, _payment} ->

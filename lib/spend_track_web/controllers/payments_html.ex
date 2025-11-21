@@ -78,7 +78,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
                 </p>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                {payment.amount} {payment.currency}
+                {payment.amount}
               </td>
               <td :if={@show_category} class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div :if={payment.category} class="flex items-center gap-2">
@@ -149,7 +149,6 @@ defmodule SpendTrackWeb.PaymentsHTML do
       />
       <.input field={f[:time]} type="datetime-local" label="Time" />
       <.input field={f[:amount]} type="number" label="Amount" step="0.01" />
-      <.input field={f[:currency]} type="text" label="Currency" />
       <.input field={f[:counterparty]} type="text" label="Counterparty" />
       <.input field={f[:note]} type="textarea" label="Note" />
       <:actions>
