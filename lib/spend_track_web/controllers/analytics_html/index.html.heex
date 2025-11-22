@@ -37,6 +37,21 @@
   </div>
 </div>
 
+<div
+  id="charts-container"
+  class="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-8"
+  data-categories={Jason.encode!(@category_sums)}
+>
+  <div class="rounded-xl bg-zinc-50 p-6 border border-zinc-200">
+    <p class="text-sm font-medium text-zinc-500 mb-4">Spent Breakdown</p>
+    <canvas id="spentChart"></canvas>
+  </div>
+  <div class="rounded-xl bg-zinc-50 p-6 border border-zinc-200">
+    <p class="text-sm font-medium text-zinc-500 mb-4">Received Breakdown</p>
+    <canvas id="receivedChart"></canvas>
+  </div>
+</div>
+
 <div class="rounded-xl border border-zinc-200 bg-white shadow-sm">
   <div class="border-b border-zinc-200 px-6 py-4">
     <h2 class="text-lg font-semibold text-zinc-900">Category Breakdown</h2>

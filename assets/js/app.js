@@ -42,3 +42,7 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+import {initAnalyticsCharts} from "./analytics"
+document.addEventListener("phx:page-loading-stop", () => initAnalyticsCharts())
+document.addEventListener("DOMContentLoaded", () => initAnalyticsCharts())
+
