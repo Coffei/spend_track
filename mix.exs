@@ -59,7 +59,8 @@ defmodule SpendTrack.MixProject do
       {:ueberauth_google, "~> 0.10"},
       {:nimble_csv, "~> 1.3"},
       {:codepagex, "~> 0.1.13"},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:number, "~> 1.0"}
     ]
   end
 

@@ -78,7 +78,7 @@ defmodule SpendTrackWeb.PaymentsHTML do
                 </p>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
-                {payment.amount}
+                {format_currency(payment.amount)}
               </td>
               <td :if={@show_category} class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 <div :if={payment.category} class="flex items-center gap-2">
