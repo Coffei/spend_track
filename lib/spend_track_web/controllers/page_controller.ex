@@ -1,9 +1,14 @@
 defmodule SpendTrackWeb.PageController do
   use SpendTrackWeb, :controller
 
+  alias SpendTrack.Analytics
+
   def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home)
+    if conn.assigns.current_user do
+      analytics_data = Analytics.get_home_analytics(conn.assigns.current_user.id)
+      render(conn, :home, analytics_data: analytics_data)
+    else
+      render(conn, :home)
+    end
   end
 end
