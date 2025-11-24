@@ -26,6 +26,7 @@ defmodule SpendTrackWeb.CategoriesHTML do
     >
       <.input field={f[:color]} type="color" label="Color" class="!size-8" />
       <.input field={f[:name]} label="Name" type="text" />
+      <.input field={f[:hide_in_analytics]} label="Hide in analytics" type="checkbox" />
       <:actions>
         <.button type="submit">{@submit_label}</.button>
         <%= for cancel <- @cancel do %>

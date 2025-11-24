@@ -14,6 +14,7 @@ defmodule SpendTrack.Model.Category do
   schema "categories" do
     field :name, :string
     field :color, :string
+    field :hide_in_analytics, :boolean, default: false
     field :payment_count, :integer, virtual: true
 
     has_many :payments, SpendTrack.Model.Payment
@@ -25,7 +26,7 @@ defmodule SpendTrack.Model.Category do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(category, attrs) do
     category
-    |> cast(attrs, [:name, :color])
+    |> cast(attrs, [:name, :color, :hide_in_analytics])
     |> validate_required([:name, :color])
   end
 end

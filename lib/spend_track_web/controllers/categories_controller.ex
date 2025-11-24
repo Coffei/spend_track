@@ -62,7 +62,7 @@ defmodule SpendTrackWeb.CategoriesController do
       }) do
     category = Categories.get_category!(id)
 
-    attrs = Map.take(category_params, ["color", "name"])
+    attrs = Map.take(category_params, ["color", "name", "hide_in_analytics"])
 
     case Categories.update_category(category, attrs) do
       {:ok, _category} ->

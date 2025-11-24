@@ -179,9 +179,11 @@ defmodule SpendTrack.Payments do
     res =
       from(p in Payment,
         join: a in assoc(p, :account),
+        left_join: c in assoc(p, :category),
         where: a.user_id == ^user_id,
         where: p.time >= ^from,
         where: p.time <= ^to,
+        where: is_nil(c.hide_in_analytics) or c.hide_in_analytics == false,
         select: %{
           received: filter(sum(p.amount), p.amount > 0),
           spent: filter(sum(p.amount), p.amount < 0)
@@ -202,6 +204,7 @@ defmodule SpendTrack.Payments do
       where: a.user_id == ^user_id,
       where: p.time >= ^from,
       where: p.time <= ^to,
+      where: is_nil(c.hide_in_analytics) or c.hide_in_analytics == false,
       group_by: [c.name, c.color],
       select: %{
         name: c.name,
