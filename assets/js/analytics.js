@@ -7,6 +7,38 @@ export function initAnalyticsCharts() {
   const spentCtx = document.getElementById('spentChart');
   const receivedCtx = document.getElementById('receivedChart');
 
+  const formatCurrency = (value) => {
+    const parts = value.toFixed(2).split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+    return parts.join(',');
+  };
+
+  const chartOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom',
+      },
+      title: {
+        display: false
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            let label = context.label || '';
+            if (label) {
+              label += ': ';
+            }
+            if (context.parsed !== null) {
+              label += formatCurrency(context.parsed);
+            }
+            return label;
+          }
+        }
+      }
+    }
+  };
+
   if (spentCtx) {
     const spentData = categories
       .filter(c => c.spent < 0)
@@ -26,17 +58,7 @@ export function initAnalyticsCharts() {
           borderWidth: 1
         }]
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-          },
-          title: {
-            display: false
-          }
-        }
-      }
+      options: chartOptions
     });
   }
 
@@ -59,17 +81,7 @@ export function initAnalyticsCharts() {
           borderWidth: 1
         }]
       },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-          },
-          title: {
-            display: false
-          }
-        }
-      }
+      options: chartOptions
     });
   }
 }
