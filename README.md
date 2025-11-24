@@ -1,18 +1,58 @@
 # SpendTrack
 
+Track your spending with clarity. Understand exactly where your money is going with analytics and automated tracking.
+
+## Features
+
+- **Bank Imports**: Seamlessly import transactions from major banks (now only Komerční Banka and Raiffeisen Bank) to keep your records up to date without manual entry.
+- **Smart Categorization**: Define fixed deterministic rules once, and watch as new payments are automatically sorted into the right categories instantly upon import.
+- **Insightful Analytics**: Gain valuable insights with clean, simple charts that help you visualize spending habits and make informed financial decisions.
+- **Secure Access**: Get started instantly with secure Google Login. Your data is protected and accessible only to you.
+
+## Developer Guide
+
+### Prerequisites
+
+- Elixir (and Erlang)
+- PostgreSQL (or Docker)
+
+### Setup
+
 To start your Phoenix server:
 
-  * Run `mix setup` to install and setup dependencies
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+1. Run `mix setup` to install and setup dependencies.
+2. Ensure you have the necessary environment variables set for Google OAuth:
+    - `GOOGLE_CLIENT_ID`
+    - `GOOGLE_CLIENT_SECRET`
+3. Prepare your Postgresql instance
+  1. Either with docker - `docker compose up -d`
+  2. Or yourself
+    - hostname `localhost`
+    - database `spend_track_dev`
+    - user `postgres`
+    - password `postgres`
+    - or customize this in `config/dev.exs`
+
+### Running the Server
+
+Start the Phoenix endpoint with:
+
+```bash
+mix phx.server
+```
+
+Or inside IEx:
+
+```bash
+iex -S mix phx.server
+```
 
 Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+### Learn more
 
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+- Official website: <https://www.phoenixframework.org/>
+- Guides: <https://hexdocs.pm/phoenix/overview.html>
+- Docs: <https://hexdocs.pm/phoenix>
+- Forum: <https://elixirforum.com/c/phoenix-forum>
+- Source: <https://github.com/phoenixframework/phoenix>
