@@ -56,3 +56,21 @@ Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 - Docs: <https://hexdocs.pm/phoenix>
 - Forum: <https://elixirforum.com/c/phoenix-forum>
 - Source: <https://github.com/phoenixframework/phoenix>
+
+## Running in production
+
+First create the production environment variables file:
+
+```bash
+cp docker-prod/.env.sample docker-prod/.env
+```
+
+And fill in the necessary environment variables.
+
+To run the server in production, use:
+
+```bash
+cd docker-prod
+docker compose build
+docker compose up -d
+```

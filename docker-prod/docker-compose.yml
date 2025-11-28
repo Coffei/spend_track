@@ -1,0 +1,28 @@
+services:
+  spend_track:
+    build: ../
+    container_name: spend_track
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: 'ecto://postgres:${POSTGRES_PASSWORD}@postgres:5432/spend_track'
+    ports:
+      - '80:4000'
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:18
+    container_name: spend_track_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: spend_track
+      POSTGRES_USER: postgres
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+volumes:
+  pgdata:
