@@ -2,6 +2,8 @@
 
 Track your spending with clarity. Understand exactly where your money is going with analytics and automated tracking.
 
+Now running at: https://spendtrack.eu.
+
 ## Features
 
 - **Bank Imports**: Seamlessly import transactions from major banks (now only Komerční Banka and Raiffeisen Bank) to keep your records up to date without manual entry.
