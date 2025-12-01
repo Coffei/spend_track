@@ -61,13 +61,13 @@ defmodule SpendTrack.Analytics do
       category_sums
       |> Enum.filter(fn cat -> Decimal.lt?(cat.spent, 0) end)
       # spent is negative, so smallest (most negative) is top spender
-      |> Enum.sort_by(& &1.spent, :asc)
+      |> Enum.sort_by(& &1.spent, {:asc, Decimal})
       |> Enum.take(3)
 
     top_received_categories =
       category_sums
       |> Enum.filter(fn cat -> Decimal.gt?(cat.received, 0) end)
-      |> Enum.sort_by(& &1.received, :desc)
+      |> Enum.sort_by(& &1.received, {:desc, Decimal})
       |> Enum.take(3)
 
     %{
