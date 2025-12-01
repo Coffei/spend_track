@@ -11,6 +11,25 @@ Now running at: https://spendtrack.eu.
 - **Insightful Analytics**: Gain valuable insights with clean, simple charts that help you visualize spending habits and make informed financial decisions.
 - **Secure Access**: Get started instantly with secure Google Login. Your data is protected and accessible only to you.
 
+## AI Disclaimer
+
+AI was used during the development of this project. I used about 80% Cursor and 20% Antigravity with
+Gemini 3.
+
+I used AI because I have very limited time and have issues completing projects. I was interested if
+AI can help me with that. I also wanted to evaluate different AI services, so it was also a way to
+compare/benchmark them.
+
+Since I usually can't dedicate that much time to a project, it is not uncommon that a project dies
+before getting to a point where it is usable. Here, with the help of AI, I was able to reach and
+sustain much higher pace of development. The ability to skip boring bits, or stuff I didn't feel
+like doing at the time helped me to keep focus and interest.
+
+I was able to bring this project into completion (from idea to production, complete in the sense of
+the scope I set out to do originally) in about 20 hours.
+
+I call this a win.
+
 ## Developer Guide
 
 ### Prerequisites
