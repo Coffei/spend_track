@@ -32,13 +32,13 @@ defmodule SpendTrack.Analytics do
             list(%{
               name: String.t(),
               color: String.t(),
-              spent: Decimal.t()
+              total: Decimal.t()
             }),
           top_received_categories:
             list(%{
               name: String.t(),
               color: String.t(),
-              received: Decimal.t()
+              total: Decimal.t()
             })
         }
   defp get_month_analytics(user_id, year, month) do
@@ -59,15 +59,15 @@ defmodule SpendTrack.Analytics do
 
     top_categories =
       category_sums
-      |> Enum.filter(fn cat -> Decimal.lt?(cat.spent, 0) end)
+      |> Enum.filter(fn cat -> Decimal.lt?(cat.total, 0) end)
       # spent is negative, so smallest (most negative) is top spender
-      |> Enum.sort_by(& &1.spent, {:asc, Decimal})
+      |> Enum.sort_by(& &1.total, {:asc, Decimal})
       |> Enum.take(3)
 
     top_received_categories =
       category_sums
-      |> Enum.filter(fn cat -> Decimal.gt?(cat.received, 0) end)
-      |> Enum.sort_by(& &1.received, {:desc, Decimal})
+      |> Enum.filter(fn cat -> Decimal.gt?(cat.total, 0) end)
+      |> Enum.sort_by(& &1.total, {:desc, Decimal})
       |> Enum.take(3)
 
     %{

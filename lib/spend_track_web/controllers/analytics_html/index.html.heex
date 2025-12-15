@@ -81,9 +81,12 @@
           </div>
           <div class="text-right">
             <div class="font-medium text-zinc-900">
-              {format_currency(category.spent)}
+              {format_currency(category.total)}
             </div>
-            <%= if Decimal.gt?(category.received, 0) do %>
+            <%= if Decimal.lt?(category.spent, 0) and Decimal.gt?(category.received, 0) do %>
+              <div class="text-xs text-red-600">
+                + {format_currency(category.spent)}
+              </div>
               <div class="text-xs text-green-600">
                 + {format_currency(category.received)}
               </div>

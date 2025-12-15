@@ -177,16 +177,25 @@ defmodule SpendTrack.Payments do
           {received :: Decimal.t(), spent :: Decimal.t()}
   def sum(user_id, from, to) do
     res =
-      from(p in Payment,
-        join: a in assoc(p, :account),
-        left_join: c in assoc(p, :category),
-        where: a.user_id == ^user_id,
-        where: p.time >= ^from,
-        where: p.time <= ^to,
-        where: is_nil(c.hide_in_analytics) or c.hide_in_analytics == false,
+      from(
+        p in subquery(
+          from(p in Payment,
+            join: a in assoc(p, :account),
+            left_join: c in assoc(p, :category),
+            where: a.user_id == ^user_id,
+            where: p.time >= ^from,
+            where: p.time <= ^to,
+            where: is_nil(c.hide_in_analytics) or c.hide_in_analytics == false,
+            group_by: c.id,
+            select: %{
+              category_id: c.id,
+              total: sum(p.amount)
+            }
+          )
+        ),
         select: %{
-          received: filter(sum(p.amount), p.amount > 0),
-          spent: filter(sum(p.amount), p.amount < 0)
+          received: filter(sum(p.total), p.total > 0),
+          spent: filter(sum(p.total), p.total < 0)
         }
       )
       |> Repo.one()
@@ -195,7 +204,13 @@ defmodule SpendTrack.Payments do
   end
 
   @spec sum_by_category(integer(), DateTime.t(), DateTime.t()) :: [
-          %{name: String.t(), color: String.t(), spent: Decimal.t(), received: Decimal.t()}
+          %{
+            name: String.t(),
+            color: String.t(),
+            spent: Decimal.t(),
+            received: Decimal.t(),
+            total: Decimal.t()
+          }
         ]
   def sum_by_category(user_id, from, to) do
     from(p in Payment,
@@ -210,17 +225,19 @@ defmodule SpendTrack.Payments do
         name: c.name,
         color: c.color,
         spent: filter(sum(p.amount), p.amount < 0),
-        received: filter(sum(p.amount), p.amount > 0)
+        received: filter(sum(p.amount), p.amount > 0),
+        total: filter(sum(p.amount))
       }
     )
     |> Repo.all()
-    |> Enum.sort_by(&{is_nil(&1.name), &1.name})
-    |> Enum.map(fn %{name: name, color: color, spent: spent, received: received} ->
+    |> Enum.sort_by(&{-Decimal.to_float(Decimal.abs(&1.total)), is_nil(&1.name), &1.name})
+    |> Enum.map(fn %{name: name, color: color, spent: spent, received: received, total: total} ->
       %{
         name: name,
         color: color,
         spent: spent || Decimal.new(0),
-        received: received || Decimal.new(0)
+        received: received || Decimal.new(0),
+        total: total || Decimal.new(0)
       }
     end)
   end

@@ -41,10 +41,10 @@ export function initAnalyticsCharts() {
 
   if (spentCtx) {
     const spentData = categories
-      .filter(c => c.spent < 0)
+      .filter(c => c.total < 0)
       .map(c => ({
         label: c.name || 'Other',
-        value: Math.abs(c.spent),
+        value: Math.abs(c.total),
         color: c.color || '#cccccc'
       }));
 
@@ -64,10 +64,10 @@ export function initAnalyticsCharts() {
 
   if (receivedCtx) {
     const receivedData = categories
-      .filter(c => c.received > 0)
+      .filter(c => c.total > 0)
       .map(c => ({
         label: c.name || 'Other',
-        value: c.received,
+        value: c.total,
         color: c.color || '#cccccc'
       }));
 
