@@ -6,9 +6,17 @@ defmodule SpendTrack.Import do
   @spec csv_to_payments(String.t()) :: {:ok, list(map())} | {:error, String.t()}
   def csv_to_payments(csv_string) do
     csv_string
-    |> Codepagex.to_string!("VENDORS/MICSFT/WINDOWS/CP1250")
+    |> ensure_utf8()
     |> CsvParser.parse_string(skip_headers: false)
     |> convert()
+  end
+
+  defp ensure_utf8(string) do
+    if String.valid?(string) do
+      string
+    else
+      Codepagex.to_string!(string, "VENDORS/MICSFT/WINDOWS/CP1250")
+    end
   end
 
   defp convert(csv_data) do
