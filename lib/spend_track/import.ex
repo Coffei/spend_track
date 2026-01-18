@@ -1,21 +1,40 @@
 NimbleCSV.define(SpendTrack.CsvParser, separator: ";", escape: "\"")
 
 defmodule SpendTrack.Import do
+  alias NimbleCSV.ParseError
   alias SpendTrack.CsvParser
+
+  require Logger
 
   @spec csv_to_payments(String.t()) :: {:ok, list(map())} | {:error, String.t()}
   def csv_to_payments(csv_string) do
-    csv_string
-    |> ensure_utf8()
-    |> CsvParser.parse_string(skip_headers: false)
-    |> convert()
+    with {:ok, utf8_string} <- ensure_utf8(csv_string) do
+      utf8_string
+      |> CsvParser.parse_string(skip_headers: false)
+      |> convert()
+    end
+  rescue
+    ParseError ->
+      {:error, "Cannot parse this CSV, likely an invalid CSV or file encoding."}
   end
 
   defp ensure_utf8(string) do
     if String.valid?(string) do
-      string
+      {:ok, string}
     else
-      Codepagex.to_string!(string, "VENDORS/MICSFT/WINDOWS/CP1250")
+      case Codepagex.to_string(string, "VENDORS/MICSFT/WINDOWS/CP1250") do
+        {:ok, converted} ->
+          {:ok, converted}
+
+        {:error, reason} ->
+          Logger.error(
+            "Failed to decode CSV file. " <>
+              "Input is not valid UTF-8 and CP1250 conversion failed: #{inspect(reason)}."
+          )
+
+          {:error,
+           "Unable to read the file. The file encoding is not supported (expected UTF-8 or Windows-1250)."}
+      end
     end
   end
 
