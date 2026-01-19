@@ -115,7 +115,6 @@ defmodule SpendTrack.Import do
         "Zaúčtovaná částka",
         "Měna účtu",
         "Číslo protiúčtu",
-        "Název obchodníka",
         "Název protiúčtu",
         "Zpráva"
       ],
@@ -138,7 +137,6 @@ defmodule SpendTrack.Import do
     csv_data
     |> to_map()
     |> to_payments("Datum zaúčtování", "Zaúčtovaná částka", "Číslo protiúčtu", [
-      "Název obchodníka",
       "Název protiúčtu",
       "Zpráva"
     ])
