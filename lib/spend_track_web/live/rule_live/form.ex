@@ -29,7 +29,7 @@ defmodule SpendTrackWeb.RuleLive.Form do
           {%Rule{}, "Create new rule", "Create", "new-rule-form", []}
       end
 
-    categories = Categories.list_categories()
+    categories = Categories.list_categories(user_id)
     changeset = Rules.change_rule(rule)
 
     other_payments =

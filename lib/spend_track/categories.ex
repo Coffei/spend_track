@@ -8,10 +8,11 @@ defmodule SpendTrack.Categories do
   alias SpendTrack.Model.Category
   alias SpendTrack.Model.Payment
 
-  @spec list_categories() :: [Category.t()]
-  def list_categories do
+  @spec list_categories(integer()) :: [Category.t()]
+  def list_categories(user_id) do
     from(c in Category,
       left_join: p in assoc(c, :payments),
+      where: c.user_id == ^user_id,
       group_by: c.id,
       select: c,
       select_merge: %{payment_count: coalesce(count(p.id), 0)}
@@ -19,22 +20,28 @@ defmodule SpendTrack.Categories do
     |> Repo.all()
   end
 
-  @spec count_other_payments() :: integer()
-  def count_other_payments() do
+  @spec count_other_payments(integer()) :: integer()
+  def count_other_payments(user_id) do
     from(p in Payment,
+      join: a in assoc(p, :account),
+      where: a.user_id == ^user_id,
       where: is_nil(p.category_id),
       select: count(p.id)
     )
     |> Repo.one()
   end
 
-  @spec get_category!(integer()) :: Category.t()
-  def get_category!(id), do: Repo.get!(Category, id)
+  @spec get_category!(integer(), integer()) :: Category.t()
+  def get_category!(id, user_id) do
+    from(c in Category, where: c.id == ^id and c.user_id == ^user_id)
+    |> Repo.one!()
+  end
 
-  @spec create_category(map()) :: {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
-  def create_category(attrs \\ %{}) do
+  @spec create_category(integer(), map()) ::
+          {:ok, Category.t()} | {:error, Ecto.Changeset.t()}
+  def create_category(user_id, attrs \\ %{}) do
     %Category{}
-    |> Category.changeset(attrs)
+    |> Category.changeset(Map.put(attrs, "user_id", user_id))
     |> Repo.insert()
   end
 
