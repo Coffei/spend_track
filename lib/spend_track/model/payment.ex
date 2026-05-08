@@ -4,6 +4,7 @@ defmodule SpendTrack.Model.Payment do
 
   alias SpendTrack.Model.Account
   alias SpendTrack.Model.Category
+  alias SpendTrack.Model.Rule
 
   @type t :: %__MODULE__{
           id: integer() | nil,
@@ -13,6 +14,7 @@ defmodule SpendTrack.Model.Payment do
           counterparty: String.t() | nil,
           account_id: integer() | nil,
           category_id: integer() | nil,
+          rule_id: integer() | nil,
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }
@@ -25,6 +27,7 @@ defmodule SpendTrack.Model.Payment do
 
     belongs_to :account, Account
     belongs_to :category, Category
+    belongs_to :rule, Rule
 
     timestamps()
   end
@@ -33,7 +36,7 @@ defmodule SpendTrack.Model.Payment do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(payment, attrs) do
     payment
-    |> cast(attrs, [:time, :amount, :note, :counterparty, :account_id, :category_id])
+    |> cast(attrs, [:time, :amount, :note, :counterparty, :account_id, :category_id, :rule_id])
     |> validate_required([:time, :amount, :counterparty, :account_id])
   end
 end

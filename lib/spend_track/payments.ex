@@ -22,16 +22,18 @@ defmodule SpendTrack.Payments do
       counterparty: get_field(changeset, :counterparty)
     }
 
-    category_id =
+    matched =
       with user_id when not is_nil(user_id) <- account_user_id(get_field(changeset, :account_id)) do
-        Rules.find_category_for_payment(temp_payment, user_id)
+        Rules.find_rule_for_payment(temp_payment, user_id)
       end
 
     changeset =
-      if category_id do
-        put_change(changeset, :category_id, category_id)
-      else
+      if matched do
         changeset
+        |> put_change(:category_id, matched.category_id)
+        |> put_change(:rule_id, matched.id)
+      else
+        put_change(changeset, :rule_id, nil)
       end
 
     Repo.insert(changeset)
@@ -49,17 +51,21 @@ defmodule SpendTrack.Payments do
       counterparty: get_field(changeset, :counterparty)
     }
 
-    category_id =
+    matched =
       with user_id when not is_nil(user_id) <- account_user_id(get_field(changeset, :account_id)) do
-        Rules.find_category_for_payment(temp_payment, user_id)
+        Rules.find_rule_for_payment(temp_payment, user_id)
       end
 
+    matched_category_id = matched && matched.category_id
+
     changeset =
-      if category_id != get_field(changeset, :category_id) do
-        put_change(changeset, :category_id, category_id)
+      if matched_category_id != get_field(changeset, :category_id) do
+        put_change(changeset, :category_id, matched_category_id)
       else
         changeset
       end
+
+    changeset = put_change(changeset, :rule_id, matched && matched.id)
 
     Repo.update(changeset)
   end

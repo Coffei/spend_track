@@ -109,8 +109,8 @@ defmodule SpendTrack.Rules do
     |> Repo.all()
   end
 
-  @spec find_category_for_payment(Payment.t(), integer()) :: integer() | nil
-  def find_category_for_payment(payment, user_id) do
+  @spec find_rule_for_payment(Payment.t(), integer()) :: Rule.t() | nil
+  def find_rule_for_payment(payment, user_id) do
     from(r in Rule,
       where: r.user_id == ^user_id,
       where:
@@ -119,8 +119,7 @@ defmodule SpendTrack.Rules do
           (is_nil(r.note_filter) or
              like(^payment.note, fragment("'%' || ? || '%'", r.note_filter))),
       order_by: [asc: r.id],
-      limit: 1,
-      select: r.category_id
+      limit: 1
     )
     |> Repo.one()
   end
@@ -144,20 +143,12 @@ defmodule SpendTrack.Rules do
         ON p.id = mr.pid
       WHERE p.category_id IS DISTINCT FROM mr.category_id
     ), updated_payments AS (
-    UPDATE payments
-    SET category_id = (
-      SELECT r.category_id
-      FROM rules r
-      WHERE r.user_id = $1
-        AND (r.counterparty_filter IS NULL OR payments.counterparty LIKE '%' || r.counterparty_filter || '%')
-        AND (r.note_filter IS NULL OR payments.note LIKE '%' || r.note_filter || '%')
-      ORDER BY r.id
-      LIMIT 1
-    )
-    WHERE EXISTS (
-      SELECT 1 FROM accounts a
-      WHERE a.id = payments.account_id AND a.user_id = $1
-    )
+      UPDATE payments
+      SET category_id = mr.category_id,
+          rule_id = mr.rid
+      FROM matching_rules mr
+      WHERE payments.id = mr.pid
+      RETURNING payments.id
     )
     SELECT
       (SELECT COUNT(*) FROM stats_data) as updated_count,
