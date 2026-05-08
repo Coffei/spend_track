@@ -172,7 +172,7 @@ defmodule SpendTrack.Payments do
 
     case result do
       {:ok, _payments} ->
-        Rules.run_all()
+        Rules.run_all(account_user_id(account_id))
         {:ok, length(new_payments), skipped}
 
       {:error, changeset} ->

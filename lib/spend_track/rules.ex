@@ -35,7 +35,7 @@ defmodule SpendTrack.Rules do
     |> Repo.insert()
     |> then(fn
       {:ok, run} ->
-        stats = run_all()
+        stats = run_all(run.user_id)
         {:ok, run, stats}
 
       error ->
@@ -51,7 +51,7 @@ defmodule SpendTrack.Rules do
     |> Repo.update()
     |> then(fn
       {:ok, run} ->
-        stats = run_all()
+        stats = run_all(run.user_id)
         {:ok, run, stats}
 
       error ->
@@ -66,7 +66,7 @@ defmodule SpendTrack.Rules do
       {:ok, run} ->
         # here we could rematch payments with the category of the deleted rule, but just re-match
         # all for now
-        stats = run_all()
+        stats = run_all(run.user_id)
         {:ok, run, stats}
 
       error ->
@@ -125,39 +125,46 @@ defmodule SpendTrack.Rules do
     |> Repo.one()
   end
 
-  @spec run_all() :: match_stats
-  def run_all do
-    res =
-      """
-      WITH matching_rules AS (
-        SELECT DISTINCT ON (p.id) p.id as pid, r.id as rid, r.category_id
-        FROM payments p
-        LEFT OUTER JOIN rules r
-          ON (r.counterparty_filter IS NULL OR p.counterparty LIKE '%' || r.counterparty_filter || '%')
-            AND (r.note_filter IS NULL OR p.note LIKE '%' || r.note_filter || '%')
-        ORDER BY p.id, r.id
-      ), stats_data AS (
-        SELECT p.id, mr.category_id
-        FROM payments p
-        INNER JOIN matching_rules mr
-          ON p.id = mr.pid
-        WHERE p.category_id IS DISTINCT FROM mr.category_id
-      ), updated_payments AS (
-      UPDATE payments
-      SET category_id = (
-        SELECT r.category_id
-        FROM rules r
-        WHERE (r.counterparty_filter IS NULL OR payments.counterparty LIKE '%' || r.counterparty_filter || '%')
-          AND (r.note_filter IS NULL OR payments.note LIKE '%' || r.note_filter || '%')
-        ORDER BY r.id
-        LIMIT 1
-      )
-      )
-      SELECT
-        (SELECT COUNT(*) FROM stats_data) as updated_count,
-        (SELECT COUNT(*) FROM stats_data WHERE category_id IS NULL) as set_to_null_count
-      """
-      |> Repo.query!()
+  @spec run_all(integer()) :: match_stats
+  def run_all(user_id) do
+    sql = """
+    WITH matching_rules AS (
+      SELECT DISTINCT ON (p.id) p.id as pid, r.id as rid, r.category_id
+      FROM payments p
+      INNER JOIN accounts a ON a.id = p.account_id AND a.user_id = $1
+      LEFT OUTER JOIN rules r
+        ON r.user_id = $1
+        AND (r.counterparty_filter IS NULL OR p.counterparty LIKE '%' || r.counterparty_filter || '%')
+        AND (r.note_filter IS NULL OR p.note LIKE '%' || r.note_filter || '%')
+      ORDER BY p.id, r.id
+    ), stats_data AS (
+      SELECT p.id, mr.category_id
+      FROM payments p
+      INNER JOIN matching_rules mr
+        ON p.id = mr.pid
+      WHERE p.category_id IS DISTINCT FROM mr.category_id
+    ), updated_payments AS (
+    UPDATE payments
+    SET category_id = (
+      SELECT r.category_id
+      FROM rules r
+      WHERE r.user_id = $1
+        AND (r.counterparty_filter IS NULL OR payments.counterparty LIKE '%' || r.counterparty_filter || '%')
+        AND (r.note_filter IS NULL OR payments.note LIKE '%' || r.note_filter || '%')
+      ORDER BY r.id
+      LIMIT 1
+    )
+    WHERE EXISTS (
+      SELECT 1 FROM accounts a
+      WHERE a.id = payments.account_id AND a.user_id = $1
+    )
+    )
+    SELECT
+      (SELECT COUNT(*) FROM stats_data) as updated_count,
+      (SELECT COUNT(*) FROM stats_data WHERE category_id IS NULL) as set_to_null_count
+    """
+
+    res = Repo.query!(sql, [user_id])
 
     [[updated_count, set_to_null_count]] = res.rows
     %{applied: updated_count - set_to_null_count, unapplied: set_to_null_count}
