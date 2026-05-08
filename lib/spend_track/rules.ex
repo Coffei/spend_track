@@ -10,22 +10,28 @@ defmodule SpendTrack.Rules do
 
   @type match_stats :: %{applied: non_neg_integer(), unapplied: non_neg_integer()}
 
-  @spec list_rules() :: [Rule.t()]
-  def list_rules do
+  @spec list_rules(integer()) :: [Rule.t()]
+  def list_rules(user_id) do
     from(r in Rule,
+      where: r.user_id == ^user_id,
       preload: [:category],
       order_by: [asc: r.name]
     )
     |> Repo.all()
   end
 
-  @spec get_rule!(integer()) :: Rule.t()
-  def get_rule!(id), do: Repo.get!(Rule, id) |> Repo.preload(:category)
+  @spec get_rule!(integer(), integer()) :: Rule.t()
+  def get_rule!(id, user_id) do
+    from(r in Rule, where: r.id == ^id and r.user_id == ^user_id)
+    |> Repo.one!()
+    |> Repo.preload(:category)
+  end
 
-  @spec create_rule(map()) :: {:ok, Rule.t(), match_stats()} | {:error, Ecto.Changeset.t()}
-  def create_rule(attrs \\ %{}) do
+  @spec create_rule(integer(), map()) ::
+          {:ok, Rule.t(), match_stats()} | {:error, Ecto.Changeset.t()}
+  def create_rule(user_id, attrs \\ %{}) do
     %Rule{}
-    |> Rule.changeset(attrs)
+    |> Rule.changeset(Map.put(attrs, "user_id", user_id))
     |> Repo.insert()
     |> then(fn
       {:ok, run} ->
@@ -73,25 +79,29 @@ defmodule SpendTrack.Rules do
     Rule.changeset(rule, attrs)
   end
 
-  @spec find_matching_payments(Rule.t(), integer()) :: [Payment.t()]
-  def find_matching_payments(rule, limit \\ 20) do
-    query = from(p in Payment)
+  @spec find_matching_payments(Rule.t(), integer(), integer()) :: [Payment.t()]
+  def find_matching_payments(rule, user_id, limit \\ 20) do
+    query =
+      from(p in Payment,
+        join: a in assoc(p, :account),
+        where: a.user_id == ^user_id
+      )
 
     query =
       if rule.counterparty_filter not in [nil, ""] do
-        from(p in query, where: like(p.counterparty, ^"%#{rule.counterparty_filter}%"))
+        from([p, _a] in query, where: like(p.counterparty, ^"%#{rule.counterparty_filter}%"))
       else
         query
       end
 
     query =
       if rule.note_filter not in [nil, ""] do
-        from(p in query, where: like(p.note, ^"%#{rule.note_filter}%"))
+        from([p, _a] in query, where: like(p.note, ^"%#{rule.note_filter}%"))
       else
         query
       end
 
-    from(p in query,
+    from([p, _a] in query,
       limit: ^limit,
       order_by: [desc: p.time, asc: p.counterparty, asc: p.amount],
       preload: [:account, :category]
@@ -99,9 +109,10 @@ defmodule SpendTrack.Rules do
     |> Repo.all()
   end
 
-  @spec find_category_for_payment(Payment.t()) :: integer() | nil
-  def find_category_for_payment(payment) do
+  @spec find_category_for_payment(Payment.t(), integer()) :: integer() | nil
+  def find_category_for_payment(payment, user_id) do
     from(r in Rule,
+      where: r.user_id == ^user_id,
       where:
         (is_nil(r.counterparty_filter) or
            like(^payment.counterparty, fragment("'%' || ? || '%'", r.counterparty_filter))) and

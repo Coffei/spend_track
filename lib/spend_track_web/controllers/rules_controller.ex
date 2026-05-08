@@ -3,14 +3,14 @@ defmodule SpendTrackWeb.RulesController do
 
   alias SpendTrack.Rules
 
-  def index(conn, _params) do
-    rules = Rules.list_rules()
+  def index(%{assigns: %{current_user: current_user}} = conn, _params) do
+    rules = Rules.list_rules(current_user.id)
 
     render(conn, :index, rules: rules)
   end
 
-  def delete(conn, %{"id" => id}) do
-    rule = Rules.get_rule!(id)
+  def delete(%{assigns: %{current_user: current_user}} = conn, %{"id" => id}) do
+    rule = Rules.get_rule!(id, current_user.id)
 
     case Rules.delete_rule(rule) do
       {:ok, _, %{applied: set, unapplied: unset}} ->

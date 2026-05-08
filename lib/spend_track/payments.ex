@@ -6,6 +6,7 @@ defmodule SpendTrack.Payments do
   import Ecto.Changeset, only: [get_field: 2, put_change: 3]
   import Ecto.Query, warn: false
   alias SpendTrack.Repo
+  alias SpendTrack.Model.Account
   alias SpendTrack.Model.Payment
   alias SpendTrack.Rules
 
@@ -21,7 +22,10 @@ defmodule SpendTrack.Payments do
       counterparty: get_field(changeset, :counterparty)
     }
 
-    category_id = Rules.find_category_for_payment(temp_payment)
+    category_id =
+      with user_id when not is_nil(user_id) <- account_user_id(get_field(changeset, :account_id)) do
+        Rules.find_category_for_payment(temp_payment, user_id)
+      end
 
     changeset =
       if category_id do
@@ -45,7 +49,10 @@ defmodule SpendTrack.Payments do
       counterparty: get_field(changeset, :counterparty)
     }
 
-    category_id = Rules.find_category_for_payment(temp_payment)
+    category_id =
+      with user_id when not is_nil(user_id) <- account_user_id(get_field(changeset, :account_id)) do
+        Rules.find_category_for_payment(temp_payment, user_id)
+      end
 
     changeset =
       if category_id != get_field(changeset, :category_id) do
@@ -240,5 +247,11 @@ defmodule SpendTrack.Payments do
         total: total || Decimal.new(0)
       }
     end)
+  end
+
+  defp account_user_id(nil), do: nil
+
+  defp account_user_id(account_id) do
+    from(a in Account, where: a.id == ^account_id, select: a.user_id) |> Repo.one()
   end
 end

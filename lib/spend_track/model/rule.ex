@@ -3,10 +3,12 @@ defmodule SpendTrack.Model.Rule do
   import Ecto.Changeset
 
   alias SpendTrack.Model.Category
+  alias SpendTrack.Model.User
 
   @type t :: %__MODULE__{
           id: integer() | nil,
           name: String.t() | nil,
+          user_id: integer() | nil,
           category_id: integer() | nil,
           counterparty_filter: String.t() | nil,
           note_filter: String.t() | nil,
@@ -20,6 +22,7 @@ defmodule SpendTrack.Model.Rule do
     field :counterparty_filter, :string
     field :note_filter, :string
 
+    belongs_to :user, User
     belongs_to :category, Category
 
     timestamps()
@@ -29,9 +32,9 @@ defmodule SpendTrack.Model.Rule do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(rule, attrs) do
     rule
-    |> cast(attrs, [:name, :category_id, :counterparty_filter, :note_filter])
+    |> cast(attrs, [:name, :user_id, :category_id, :counterparty_filter, :note_filter])
     |> normalize_empty_strings()
-    |> validate_required([:name, :category_id])
+    |> validate_required([:name, :user_id, :category_id])
     |> validate_at_least_one_filter()
   end
 

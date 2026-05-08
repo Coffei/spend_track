@@ -16,11 +16,13 @@ defmodule SpendTrackWeb.RuleLive.Form do
 
   @impl true
   def handle_params(params, _url, socket) do
+    user_id = socket.assigns.current_user.id
+
     {rule, page_title, submit_label, form_id, preview_payments} =
       case params do
         %{"id" => id} ->
-          rule = Rules.get_rule!(id)
-          preview_payments = Rules.find_matching_payments(rule)
+          rule = Rules.get_rule!(id, user_id)
+          preview_payments = Rules.find_matching_payments(rule, user_id)
           {rule, "Edit rule", "Save changes", "edit-rule-form", preview_payments}
 
         _ ->
@@ -31,7 +33,7 @@ defmodule SpendTrackWeb.RuleLive.Form do
     changeset = Rules.change_rule(rule)
 
     other_payments =
-      Payments.list_payments_by([user_id: socket.assigns.current_user.id, category_id: nil], 20)
+      Payments.list_payments_by([user_id: user_id, category_id: nil], 20)
 
     {:noreply,
      socket
@@ -71,7 +73,7 @@ defmodule SpendTrackWeb.RuleLive.Form do
       if socket.assigns.rule.id do
         Rules.update_rule(socket.assigns.rule, attrs)
       else
-        Rules.create_rule(attrs)
+        Rules.create_rule(socket.assigns.current_user.id, attrs)
       end
 
     case result do
@@ -157,7 +159,7 @@ defmodule SpendTrackWeb.RuleLive.Form do
             note_filter: params["note_filter"]
           }
 
-          payments = Rules.find_matching_payments(rule)
+          payments = Rules.find_matching_payments(rule, socket.assigns.current_user.id)
 
           socket
           |> assign(:preview_payments, payments)
