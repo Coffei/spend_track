@@ -13,9 +13,13 @@ defmodule SpendTrack.Rules do
   @spec list_rules(integer()) :: [Rule.t()]
   def list_rules(user_id) do
     from(r in Rule,
+      left_join: p in Payment,
+      on: p.rule_id == r.id,
       where: r.user_id == ^user_id,
-      preload: [:category],
-      order_by: [asc: r.name]
+      group_by: r.id,
+      order_by: [asc: r.name],
+      select_merge: %{application_count: count(p.id)},
+      preload: [:category]
     )
     |> Repo.all()
   end

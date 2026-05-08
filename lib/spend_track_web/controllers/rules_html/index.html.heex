@@ -18,6 +18,11 @@
       />
       <span>{rule.category.name}</span>
       <span class="font-medium text-gray-900">{rule.name}</span>
+      <span class="text-sm text-gray-500">
+        Applied to {rule.application_count} {if rule.application_count == 1,
+          do: "payment",
+          else: "payments"}
+      </span>
       <div class="ml-auto space-x-2">
         <.link
           navigate={~p"/rules/#{rule.id}/edit"}

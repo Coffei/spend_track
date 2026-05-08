@@ -13,6 +13,7 @@ defmodule SpendTrack.Model.Rule do
           counterparty_filter: String.t() | nil,
           note_filter: String.t() | nil,
           category: Category.t() | Ecto.Association.NotLoaded.t() | nil,
+          application_count: integer() | nil,
           inserted_at: NaiveDateTime.t() | nil,
           updated_at: NaiveDateTime.t() | nil
         }
@@ -21,6 +22,7 @@ defmodule SpendTrack.Model.Rule do
     field :name, :string
     field :counterparty_filter, :string
     field :note_filter, :string
+    field :application_count, :integer, virtual: true
 
     belongs_to :user, User
     belongs_to :category, Category
