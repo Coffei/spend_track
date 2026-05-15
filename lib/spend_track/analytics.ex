@@ -80,4 +80,37 @@ defmodule SpendTrack.Analytics do
       top_received_categories: top_received_categories
     }
   end
+
+  @doc """
+  Returns analytics for a rolling N-month window ending at the selected month.
+
+  When `months == 1` the bounds and figures match a single calendar month.
+  """
+  @spec get_period_analytics(pos_integer(), pos_integer(), pos_integer(), pos_integer()) :: %{
+          current_date: Date.t(),
+          start_date: Date.t(),
+          months: pos_integer(),
+          received: Decimal.t(),
+          spent: Decimal.t(),
+          category_sums: list(map())
+        }
+  def get_period_analytics(user_id, year, month, months \\ 1) when months >= 1 do
+    current_date = Date.new!(year, month, 1)
+    start_date = Timex.shift(current_date, months: -(months - 1))
+
+    from = Timex.beginning_of_month(start_date) |> Timex.to_datetime()
+    to = Timex.end_of_month(current_date) |> Timex.to_datetime()
+
+    {received, spent} = Payments.sum(user_id, from, to)
+    category_sums = Payments.sum_by_category(user_id, from, to)
+
+    %{
+      current_date: current_date,
+      start_date: start_date,
+      months: months,
+      received: received,
+      spent: spent,
+      category_sums: category_sums
+    }
+  end
 end
